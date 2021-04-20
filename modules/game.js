@@ -2,17 +2,21 @@ require('dotenv').config();
 const Discord = require('discord.js');
 const { exec } = require('child_process');
 const axios = require('axios');
-const Fuse = require('fuse.js')
+const Fuse = require('fuse.js');
+const moment = require('moment');
+require('moment/locale/id');
 
 const { checkRoles, embedError, embedMsg, embedSuccess, getUserFromMention } = require("./utility.js");
 
-const Game = async (msg, prism) => {
+const Game = async (msg, client, prism) => {
     if(!msg.content.startsWith(process.env.PREFIX)) return;
 
     const withoutPrefix = msg.content.slice(process.env.PREFIX.length);
     const split = withoutPrefix.split(/ +/);
 	const command = split[0];
 	const args = split.slice(1);
+
+    moment.locale('id');
     
     if(command === 'u') {
         if(!checkRoles(msg)) return;
@@ -98,15 +102,17 @@ const Game = async (msg, prism) => {
                 {name: 'Server Name', value: `${details.servername}`, inline: true},
                 {name: 'Server IP', value: `${details.serverIP}`, inline: true},
                 {name: 'Server PORT', value: `${details.serverPort}`, inline: true},
-                {name: 'Server Startup Time', value: `${details.serverStartupTime}`, inline: true},
-                {name: 'Server Warmup', value: `${details.serverWarmup}`, inline: true},
-                {name: 'Server Round Length', value: `${details.serverRoundLength}`, inline: true},
-            )
+                {name: 'Server Startup Time', value: `${moment.unix(details.serverStartupTime).format('LLLL')}`, inline: true},
+                {name: 'Server Warmup', value: `${moment.duration(details.serverWarmup, 'seconds').humanize()}`, inline: true},
+                {name: 'Server Round Length', value: `${moment.duration(details.serverRoundLength, 'seconds').humanize()}`, inline: true},
+                )
             .addFields(
                 { name: '\u200B', value: '\u200B' },
+                {name: 'Map', value: `${details.map}`, inline: true},
                 {name: 'Game Mode', value: `${details.mode}`, inline: true},
                 {name: 'Layer', value: `${details.layer}`, inline: true},
-                {name: 'Time Started', value: `${details.timeStarted}`, inline: true},
+                {name: 'Time Started', value: `${moment.unix(details.timeStarted).format('LLLL')}`, inline: true},
+                {name: 'Online Duration', value: `${moment.unix(details.serverStartupTime).fromNow()}`, inline: true},
             )
             .addFields(
                 { name: '\u200B', value: '\u200B' },
@@ -159,6 +165,30 @@ const Game = async (msg, prism) => {
         if(!checkRoles(msg)) return;
         prism.login();
     }
+
+    if(command === 'reconnect'){
+        if(!checkRoles(msg)) return;
+        msg.channel.send(embedSuccess('Reconneting PRISM'));
+        prism.end();
+        prism.reconnect();
+    }
+
+    if(command === 'reload'){
+        if(!checkRoles(msg)) return;
+
+        // cd /home/pr/public && su -c ./start_pr.sh pr
+        msg.channel.send(embedSuccess('PM2 Reload All!'));
+        exec(`pm2 reload all`, {cwd: '/home/pr/public'}, (err, stdout, stderr) => {
+            if (err) {
+                console.error(err)
+                msg.channel.send(embedError(err));
+            } else {
+                if(stderr){
+                    msg.channel.send(embedError(stderr));
+                }
+            }
+        });
+    }
 };
 
 async function getServerInfo(args = []){
@@ -192,7 +222,7 @@ async function getServerInfo(args = []){
                     {name: 'Players', value: players, inline: true},
                     {name: 'Map', value: map, inline: true},
                 )
-                .setFooter(`Server Time ${new Date(Date.now()).toUTCString()}`);
+                .setFooter(`Server Time ${moment().format('LLLL')}`);
         }
 
         if(args[0]){
@@ -233,7 +263,7 @@ async function getServerInfo(args = []){
                     {name: 'Team 2', value: teamTwo, inline: true},
                 )
                 .setImage(result.bf2_sponsorlogo_url)
-                .setFooter(`Server Time ${new Date(Date.now()).toUTCString()}`);
+                .setFooter(`Server Time ${moment().format('LLLL')}`);
         }
 
         result = result.properties;
@@ -251,7 +281,7 @@ async function getServerInfo(args = []){
                 {name: 'Players', value: `${result.numplayers}`},
             )
             .setImage(result.bf2_sponsorlogo_url)
-            .setFooter(`Server Time ${new Date(Date.now()).toUTCString()}`);
+            .setFooter(`Server Time ${moment().format('LLLL')}`);
 
     } catch (error) {
         return embedError(error);

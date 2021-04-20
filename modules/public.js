@@ -2,7 +2,7 @@ require('dotenv').config();
 const Discord = require('discord.js');
 const Fuse = require('fuse.js')
 
-const { embedError, embedMsg, embedSuccess, getUserFromMention } = require('./utility.js');
+const { embedError, embedMsg, embedSuccess, getUserFromMention, checkRoles} = require('./utility.js');
 
 const Public = (msg, client) => {
     const split =  msg.content.split(/ +/);
@@ -76,17 +76,11 @@ const Public = (msg, client) => {
         }
     }
 
-    if (command === '!rip') {
+    if (command === 'rip') {
         // Create the attachment using MessageAttachment
         const attachment = new Discord.MessageAttachment('https://i.imgur.com/w3duR07.png');
         // Send the attachment in the message channel
         msg.channel.send(attachment);
-
-        try {
-            msg.delete();
-        } catch (error){
-            console.error(error);
-        }
     }
 
     if(command === 'attach') {
@@ -113,6 +107,14 @@ const Public = (msg, client) => {
         // Send the attachment in the message channel
         msg.channel.send(attachment);
     }
+
+    if(command === '!gamecrash') {
+        if(!checkRoles(msg)) return;
+        const embed = new Discord.MessageEmbed()
+            .setTitle('Game Crash')
+            .setDescription(`Jika anda mengalami crash pada game Project Reality, harap membaca <#815276340461961226> dan berkonsultasi ke <#791343470911422474>. Jangan lupa untuk menyertakan **PRLauncher.log** serta **Support Info**, petunjuk tertera di <#815276340461961226> pula. Kami tidak dapat membantu tanpa kooperasi anda.`);
+        msg.channel.send(embed);
+    }  
 }
 
 module.exports = {

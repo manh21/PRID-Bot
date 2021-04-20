@@ -1,16 +1,17 @@
 require('dotenv').config();
 const crypto = require('crypto');
 const events = require('events');
+const net = require('net');
 
 class PRISM {
-    constructor(client) {
+    constructor() {
         const self = this;
         // NET
         this.port = process.env.PORT;
         this.host = process.env.HOST;
         this.output_buffer = [];
         this.input_buffer = "";
-        this.client = client;
+        this.client = null;
 
         // Credential
         this.username = process.env.PRISM_USERNAME;
@@ -24,20 +25,41 @@ class PRISM {
         this.authenticated = false;
         this.COMMAND_CHANNEL = null;
         this.eventEmitter = new events.EventEmitter();
+        this.status = false;
+
+        this.connect();
 
         this.client.on('end', () => {
-            console.log('disconnected from server');
+            this.emit_event('log', 'Disconnected from PRISM Server');
+            self.status = false;
         });
         
         this.client.on('data', function(data) {
             // console.log("RECEIVED "+data.toString());
             self.messages(data.toString());
         });
+
+        this.client.once('connect', () => {
+            self.status = true;
+            self.emit_event('log', 'Connected to PRISM Server');
+        })
     }
 
-    connect() {
-        const client = this.client;
-        client.write('world!\r\n');
+    connect(){
+        this.client = net.createConnection(process.env.PORT, process.env.HOST);
+    }
+
+    reconnect() {
+        const self = this;
+        setTimeout(() => {
+            self.client.removeAllListeners();
+            self.client = net.createConnection(process.env.PORT, process.env.HOST);
+            self.emit_event('log', 'Connecting to PRISM Server');
+        }, 1000)
+    }
+
+    end() {
+        this.client.end();
     }
 
     /**
@@ -74,6 +96,7 @@ class PRISM {
     parse_command(command){
         const message = new Message(command);
         const subject = message.subject;
+        this._log(message);
        
         switch (subject) {
             case 'login1':
@@ -81,7 +104,7 @@ class PRISM {
                 break;
 
             case 'connected':
-                this.emit_event(subject, this._h_connected(message));
+                this._h_connected(message);
                 break;
 
             case 'serverdetails':
@@ -114,6 +137,7 @@ class PRISM {
         
             default:
                 console.log('No parser found: ' + subject);
+                this._log(message);
                 break;
         }
     }
@@ -195,16 +219,16 @@ class PRISM {
 
     _h_connected(message) {
         this.authenticated = true;
-        return message;
+        this._log(message);
     }
 
     _log(message, queue = false, channel_id = null) {
-        if(channel_id){
-            channel_id = this.COMMAND_CHANNEL;
-        }
+        // if(channel_id){
+        //     channel_id = this.COMMAND_CHANNEL;
+        // }
 
         if(message instanceof Message){
-            console.log(message.messages.join(' '));
+            this.emit_event('log', message.messages.join('\n'));
         }
     }
 
@@ -218,7 +242,7 @@ class PRISM {
     _chat(message){
         if(this.isGameManagementChat(message)){
             message.messages = message.messages.slice(2);
-            console.log(message.messages);
+            this._log(message);
             switch (message.messages[0]) {
                 case 'Game':
                     this._man_game(message);
@@ -246,7 +270,7 @@ class PRISM {
     _man_adminalert(message){
         this.emit_event('adminalert', message);
     }
-
+    
     _man_response(message){
         this.emit_event('response', message);
     }
