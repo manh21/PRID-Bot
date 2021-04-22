@@ -1,8 +1,9 @@
+require('dotenv').config();
 const Discord = require('discord.js');
 
 function checkRoles(msg) {
     // Check if they have one of many roles
-    if(msg.member.roles.cache.some(role => ["Comunity Lead", "Lead Server PR", "Assistant Server PR"].includes(role.name)) ) {
+    if(msg.member.roles.cache.some(role => JSON.parse(process.env.ROLE).includes(role.name)) ) {
         return true;
     } else {
         return false;

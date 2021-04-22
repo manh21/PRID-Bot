@@ -7,6 +7,7 @@ const moment = require('moment');
 require('moment/locale/id');
 
 const { checkRoles, embedError, embedMsg, embedSuccess, getUserFromMention } = require("./utility.js");
+const log = require('./logger.js');
 
 const Game = async (msg, client, prism) => {
     if(!msg.content.startsWith(process.env.PREFIX)) return;
@@ -42,6 +43,7 @@ const Game = async (msg, client, prism) => {
                 //some err occurred
                 console.error(err)
                 msg.channel.send(embedError());
+                log.error(err);
                 return;
             } else {
                 // the *entire* stdout and stderr (buffered)
@@ -51,7 +53,8 @@ const Game = async (msg, client, prism) => {
                 exec(`kill 15 ${processID}`, (err, stdout, stderr) => {
                     if (err) console.error(err);
                     msg.channel.send(embedSuccess());
-                    console.log(stdout);
+                    log.info('PR Server Stopped');
+                    //console.log(stdout);
                 });
             }
         });
@@ -62,13 +65,16 @@ const Game = async (msg, client, prism) => {
 
         // cd /home/pr/public && su -c ./start_pr.sh pr
         msg.channel.send(embedSuccess('Starting Server!'));
+        log.info('Starting PR Server');
         exec(`./start_pr.sh`, {cwd: '/home/pr/public'}, (err, stdout, stderr) => {
             if (err) {
                 console.error(err)
                 msg.channel.send(embedError(err));
+                log.error(err);
             } else {
                 if(stderr){
                     msg.channel.send(embedError(stderr));
+                    log.error(err);
                 }
             }
         });
@@ -78,6 +84,11 @@ const Game = async (msg, client, prism) => {
         if(!checkRoles(msg)) return;
         if(!args[0]){
             exec('pidof prbf2_l64ded', (err, stdout, stderr) => {
+                if(err){
+                    log.error(err);
+                    return;
+                }
+
                 if(stdout){
                     msg.channel.send(embedMsg('Online'));
                 } else {
@@ -96,40 +107,40 @@ const Game = async (msg, client, prism) => {
         prism.get_server_details();
         prism.event.once('serverdetails', (details) => {
             const embed = new Discord.MessageEmbed()
-            .setTitle('Server Details')
-            .setColor('NOT_QUITE_BLACK')
-            .addFields(
-                {name: 'Server Name', value: `${details.servername}`, inline: true},
-                {name: 'Server IP', value: `${details.serverIP}`, inline: true},
-                {name: 'Server PORT', value: `${details.serverPort}`, inline: true},
-                {name: 'Server Startup Time', value: `${moment.unix(details.serverStartupTime).format('LLLL')}`, inline: true},
-                {name: 'Server Warmup', value: `${moment.duration(details.serverWarmup, 'seconds').humanize()}`, inline: true},
-                {name: 'Server Round Length', value: `${moment.duration(details.serverRoundLength, 'seconds').humanize()}`, inline: true},
+                .setTitle('Server Details')
+                .setColor('NOT_QUITE_BLACK')
+                .addFields(
+                    {name: 'Server Name', value: `${details.servername}`, inline: true},
+                    {name: 'Server IP', value: `${details.serverIP}`, inline: true},
+                    {name: 'Server PORT', value: `${details.serverPort}`, inline: true},
+                    {name: 'Server Startup Time', value: `${moment.unix(details.serverStartupTime).format('LLLL')}`, inline: true},
+                    {name: 'Server Warmup', value: `${moment.duration(details.serverWarmup, 'seconds').humanize()}`, inline: true},
+                    {name: 'Server Round Length', value: `${moment.duration(details.serverRoundLength, 'seconds').humanize()}`, inline: true},
+                    )
+                .addFields(
+                    { name: '\u200B', value: '\u200B' },
+                    {name: 'Map', value: `${details.map}`, inline: true},
+                    {name: 'Game Mode', value: `${details.mode}`, inline: true},
+                    {name: 'Layer', value: `${details.layer}`, inline: true},
+                    {name: 'Time Started', value: `${moment.unix(details.timeStarted).format('LLLL')}`, inline: true},
+                    {name: 'Online Duration', value: `${moment.unix(details.serverStartupTime).fromNow()}`, inline: true},
                 )
-            .addFields(
-                { name: '\u200B', value: '\u200B' },
-                {name: 'Map', value: `${details.map}`, inline: true},
-                {name: 'Game Mode', value: `${details.mode}`, inline: true},
-                {name: 'Layer', value: `${details.layer}`, inline: true},
-                {name: 'Time Started', value: `${moment.unix(details.timeStarted).format('LLLL')}`, inline: true},
-                {name: 'Online Duration', value: `${moment.unix(details.serverStartupTime).fromNow()}`, inline: true},
-            )
-            .addFields(
-                { name: '\u200B', value: '\u200B' },
-                {name: 'Team 1', value: `${details.team1}`, inline: true},
-                {name: 'Team 2', value: `${details.team2}`, inline: true},
-            )
-            .addFields(
-                { name: '\u200B', value: '\u200B' },
-                {name: 'Tickets Team 1', value: `${details.tickets1}`, inline: true},
-                {name: 'Tickets Team 2', value: `${details.tickets2}`, inline: true},
-            )
-            .addFields(
-                { name: '\u200B', value: '\u200B' },
-                {name: 'Max Players', value: `${details.maxPlayers}`,inline: true},
-                {name: 'Players', value: `${details.players}`,inline: true},
-            )
-            .setFooter(`Server Time ${new Date(Date.now()).toUTCString()}`);
+                .addFields(
+                    { name: '\u200B', value: '\u200B' },
+                    {name: 'Team 1', value: `${details.team1}`, inline: true},
+                    {name: 'Team 2', value: `${details.team2}`, inline: true},
+                )
+                .addFields(
+                    { name: '\u200B', value: '\u200B' },
+                    {name: 'Tickets Team 1', value: `${details.tickets1}`, inline: true},
+                    {name: 'Tickets Team 2', value: `${details.tickets2}`, inline: true},
+                )
+                .addFields(
+                    { name: '\u200B', value: '\u200B' },
+                    {name: 'Max Players', value: `${details.maxPlayers}`,inline: true},
+                    {name: 'Players', value: `${details.players}`,inline: true},
+                )
+                .setFooter(`Server Time ${new Date(Date.now()).toUTCString()}`);
             msg.channel.send(embed);
         });
     }
@@ -169,8 +180,13 @@ const Game = async (msg, client, prism) => {
     if(command === 'reconnect'){
         if(!checkRoles(msg)) return;
         msg.channel.send(embedSuccess('Reconneting PRISM'));
-        prism.end();
-        prism.reconnect();
+		
+        setTimeout(() => {
+			prism.disconnect();
+			setTimeout(() => {
+				prism.reconnect();
+			}, 1000); 
+		}, 1000);        
     }
 
     if(command === 'reload'){
@@ -178,13 +194,16 @@ const Game = async (msg, client, prism) => {
 
         // cd /home/pr/public && su -c ./start_pr.sh pr
         msg.channel.send(embedSuccess('PM2 Reload All!'));
-        exec(`pm2 reload all`, {cwd: '/home/pr/public'}, (err, stdout, stderr) => {
+        log.info('Reloading PM2 Services');
+        exec(`pm2 reload all`, {}, (err, stdout, stderr) => {
             if (err) {
                 console.error(err)
                 msg.channel.send(embedError(err));
+                log.error(err);
             } else {
                 if(stderr){
                     msg.channel.send(embedError(stderr));
+                    log.error(stderr);
                 }
             }
         });
@@ -285,6 +304,7 @@ async function getServerInfo(args = []){
 
     } catch (error) {
         return embedError(error);
+        log.error(error);
     }
 }
 

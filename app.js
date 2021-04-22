@@ -6,11 +6,13 @@ const { Public } = require("./modules/public.js");
 const { Game } = require("./modules/game.js");
 const { PRISM } = require('./modules/prism.js');
 const { checkRoles, embedLog, embedMsg } = require("./modules/utility.js");
+const log = require('./modules/logger.js');
 
 const main = () => {
     const client  = new Discord.Client();
 
     const prism = new PRISM();;
+	prism.connect()
 
     prism.client.once('connect', function() {
         console.info('Connected to server!')
@@ -25,36 +27,22 @@ const main = () => {
         console.info(`Logged in as ${client.user.tag}!`);
         const channel = client.channels.cache.get(process.env.LOG_CHANNEL);
 
-        channel.send(embedMsg('Bot is ready!'))
+        //channel.send(embedMsg('Bot is ready!'))
+
+        // Log
+        log.info('Bot is ready!');
 
         prism.event.prependListener('log', (messages) => {
             channel.send(embedLog(messages))
-        });
+        });     
     });
 
     client.on('message', async msg => {  
         // Public Scope Command
-        Public(msg, client);
+        //Public(msg, client);
 
         // Gameserver Scope Command
         Game(msg, client, prism);
-
-        // if(msg.content === '>reboot bot'){
-        //     if(!checkRoles(msg)) return;
-
-        //     const channel = client.channels.cache.get(process.env.LOG_CHANNEL);
-
-        //     channel.send(embedMsg('Rebooting Bot!'));
-        //     msg.channel.send(embedMsg('Rebooting Bot!'));
-
-        //     prism.end();
-
-        //     // Logout Bot
-        //     client.destroy();
-
-        //     // Restart Bot
-        //     main();
-        // }
     });
 
     client.login(TOKEN);

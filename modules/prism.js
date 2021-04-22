@@ -2,6 +2,7 @@ require('dotenv').config();
 const crypto = require('crypto');
 const events = require('events');
 const net = require('net');
+const log = require('./logger.js');
 
 class PRISM {
     constructor() {
@@ -28,38 +29,61 @@ class PRISM {
         this.status = false;
 
         this.connect();
-
-        this.client.on('end', () => {
-            this.emit_event('log', 'Disconnected from PRISM Server');
+		this.after();
+    }
+	
+	after() {
+		let self = this;
+		this.client.on('end', () => {
+            self.emit_event('log', 'Disconnected from PRISM Server');
             self.status = false;
+            log.info('Disconnected form PRISM Server');
         });
         
         this.client.on('data', function(data) {
-            // console.log("RECEIVED "+data.toString());
+            //console.log("RECEIVED "+data.toString());
             self.messages(data.toString());
         });
 
-        this.client.once('connect', () => {
+        this.client.on('connect', () => {
             self.status = true;
             self.emit_event('log', 'Connected to PRISM Server');
+            log.info('Connected to PRISM Server');
         })
-    }
+		
+		this.client.on('error', (data) => {
+			self.emit_event('log', data);
+            log.error(data);
+		})
+	}
 
     connect(){
         this.client = net.createConnection(process.env.PORT, process.env.HOST);
     }
 
-    reconnect() {
-        const self = this;
-        setTimeout(() => {
-            self.client.removeAllListeners();
-            self.client = net.createConnection(process.env.PORT, process.env.HOST);
-            self.emit_event('log', 'Connecting to PRISM Server');
-        }, 1000)
+	reconnect() {
+		let self = this;
+		this.client.removeAllListeners();
+		this.client = net.createConnection(process.env.PORT, process.env.HOST);
+		
+		this.client.on('error', err => {
+			console.error(err)
+            log.error(err);
+		})
+		
+		this.client.once('connect', function() {
+			self.emit_event('log', 'Connectd to PRISM Server');
+			console.info('Connected to server!')
+			self.after();
+			self.login();
+		})
+        log.info('Reconnecting to PRISM Server');
     }
 
-    end() {
+    disconnect() {
+		this.authenticated = false;
         this.client.end();
+        log.info('Disconnected form PRISM Server');
     }
 
     /**
@@ -96,7 +120,6 @@ class PRISM {
     parse_command(command){
         const message = new Message(command);
         const subject = message.subject;
-        this._log(message);
        
         switch (subject) {
             case 'login1':
@@ -108,7 +131,7 @@ class PRISM {
                 break;
 
             case 'serverdetails':
-                this.emit_event(subject, this._h_serverdetails(message));
+                this._h_serverdetails(message);
                 break;
 
             case 'updateserverdetails':
@@ -116,6 +139,7 @@ class PRISM {
 
             case 'APIAdminResult':
                 this.emit_event(subject, message.messages);
+				//this._log(message);
                 break;
 
             case 'chat':
@@ -123,21 +147,25 @@ class PRISM {
                 break;
 
             case 'success':
+				this._log(message);
                 break;
 
             case 'error':
                 this.emit_event('error', message);
+				this._log(message);
                 break;
 
             case 'errorcritical':
+				this._log(message);
                 break;
 
             case 'raconfig':
+				//this._log(message);
                 break;
         
             default:
                 console.log('No parser found: ' + subject);
-                this._log(message);
+                // this._log(message);
                 break;
         }
     }
@@ -174,7 +202,10 @@ class PRISM {
     }
 
     login(username = this.username, password = this.password) {
-        if(this.authenticated) return;
+        if(this.authenticated) {
+			this.emit_event('log', 'already authenticated!')
+			return
+		};
         const self = this;
         // Cryptographically Secure Pseudorandom Number Generator
         const csrpng = parseInt(crypto.randomBytes(8).toString('hex'), 16);
@@ -220,6 +251,7 @@ class PRISM {
     _h_connected(message) {
         this.authenticated = true;
         this._log(message);
+		this.emit_event('log', 'Authenticated as Skynet')
     }
 
     _log(message, queue = false, channel_id = null) {
@@ -242,18 +274,21 @@ class PRISM {
     _chat(message){
         if(this.isGameManagementChat(message)){
             message.messages = message.messages.slice(2);
-            this._log(message);
+			
             switch (message.messages[0]) {
                 case 'Game':
                     this._man_game(message);
+					this._log(message);
                     break;
 
                 case 'Admin Alert':
                     this._man_adminalert(message);
+					this._log(message);
                     break;
 
                 case 'Response':
                     this._man_response(message);
+					this._log(message);
                     break;
             
                 default:
@@ -325,7 +360,7 @@ class PRISM {
         //     details['status'] = null;
         // }
 
-        return details;
+        this.emit_event('serverdetails', details);
     }
 }
 

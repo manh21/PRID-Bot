@@ -27,4 +27,5 @@ server.on('connection', socket => {
 
 server.listen(8124, () => {
     console.log('server bound');
+	console.log('PORT 8124');
 });

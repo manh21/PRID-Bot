@@ -3,6 +3,7 @@ const Discord = require('discord.js');
 const Fuse = require('fuse.js')
 
 const { embedError, embedMsg, embedSuccess, getUserFromMention, checkRoles} = require('./utility.js');
+const log = require('./logger.js');
 
 const Public = (msg, client) => {
     const split =  msg.content.split(/ +/);
@@ -22,7 +23,6 @@ const Public = (msg, client) => {
                 .setAuthor(msg.author.tag, msg.author.displayAvatarURL())
                 .setImage(imageURL+'?size=256');
 
-            console.log(msg.author.displayAvatarURL()+'?size=256')
             msg.channel.send(embed);
             return;
         };
@@ -72,7 +72,8 @@ const Public = (msg, client) => {
         try {
             msg.delete();
         } catch (error){
-            console.error(error);
+            // console.error(error);
+            log.error(error);
         }
     }
 
@@ -92,12 +93,13 @@ const Public = (msg, client) => {
             msg.channel.send(attachment);
         } catch (error) {
             msg.channel.send(embedError(error));
+            log.error(error);
         }
 
         try {
             msg.delete();
         } catch (error){
-            console.error(error);
+            log.error(error);
         }
     }
 
@@ -114,7 +116,19 @@ const Public = (msg, client) => {
             .setTitle('Game Crash')
             .setDescription(`Jika anda mengalami crash pada game Project Reality, harap membaca <#815276340461961226> dan berkonsultasi ke <#791343470911422474>. Jangan lupa untuk menyertakan **PRLauncher.log** serta **Support Info**, petunjuk tertera di <#815276340461961226> pula. Kami tidak dapat membantu tanpa kooperasi anda.`);
         msg.channel.send(embed);
-    }  
+    }
+    
+    if(command === '!lmao'){
+        const link = 'https://media.discordapp.net/attachments/500263112881078272/834626048745668608/lol.png';
+        const attachment = new Discord.MessageAttachment(link);
+        msg.channel.send(attachment);
+        
+        try {
+            msg.delete();
+        } catch (error) {
+            log.error(error);
+        }
+    }
 }
 
 module.exports = {
