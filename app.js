@@ -12,7 +12,6 @@ const main = () => {
     const client  = new Discord.Client();
 
     const prism = new PRISM();;
-	prism.connect()
 
     prism.client.once('connect', function() {
         console.info('Connected to server!')
@@ -27,7 +26,7 @@ const main = () => {
         console.info(`Logged in as ${client.user.tag}!`);
         const channel = client.channels.cache.get(process.env.LOG_CHANNEL);
 
-        //channel.send(embedMsg('Bot is ready!'))
+        channel.send(embedMsg('Bot is ready!'))
 
         // Log
         log.info('Bot is ready!');
@@ -39,7 +38,7 @@ const main = () => {
 
     client.on('message', async msg => {  
         // Public Scope Command
-        //Public(msg, client);
+        Public(msg, client);
 
         // Gameserver Scope Command
         Game(msg, client, prism);
