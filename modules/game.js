@@ -85,6 +85,7 @@ const Game = async (msg, client, prism) => {
         if(!args[0]){
             exec('pidof prbf2_l64ded', (err, stdout, stderr) => {
                 if(err){
+                    msg.channel.send(embedMsg('Offline'));
                     log.error(err);
                     return;
                 }
@@ -152,24 +153,58 @@ const Game = async (msg, client, prism) => {
         prism.event.once('adminalert', (message) => {
             // console.log(message);
             msg.channel.send('```'+message.messages.join('\n')+'```');
-            setTimeout(() => {return}, 2000);
+            return;
         })
 
         prism.event.once('game', (message) => {
             // console.log(message);
             msg.channel.send('```'+message.messages.join('\n')+'```');
-            setTimeout(() => {return}, 2000);
+            return;
         })
 
         prism.event.once('response', (message) => {
             // console.log(message);
             msg.channel.send('```'+message.messages.join('\n')+'```');
-            setTimeout(() => {return}, 2000);
+            return;
         })
 
         prism.event.once('error', (message) => {
             msg.channel.send('```'+message.messages.join('\n')+'```');
+            return;
         });
+    }
+
+    if(command === 'admin'){
+        if(!msg.member.roles.cache.some(role => JSON.parse(process.env.LEVEL2_ROLE).includes(role.name)) ) {
+            return;
+        }
+
+        if(JSON.parse(process.env.LEVEL2_COMMAND).includes(args[0])) {
+            prism.send_raw_command('say', args.join(' '));
+            
+            prism.event.once('adminalert', (message) => {
+                // console.log(message);
+                msg.channel.send('```'+message.messages.join('\n')+'```');
+                return;
+            })
+    
+            prism.event.once('game', (message) => {
+                // console.log(message);
+                msg.channel.send('```'+message.messages.join('\n')+'```');
+                return;
+            })
+    
+            prism.event.once('response', (message) => {
+                // console.log(message);
+                msg.channel.send('```'+message.messages.join('\n')+'```');
+                return;
+            })
+    
+            prism.event.once('error', (message) => {
+                msg.channel.send('```'+message.messages.join('\n')+'```');
+                return;
+            });
+        }
     }
 
     if(command === 'login'){

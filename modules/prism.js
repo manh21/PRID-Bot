@@ -260,7 +260,7 @@ class PRISM {
         // }
 
         if(message instanceof Message){
-            this.emit_event('log', message.messages.join('\n'));
+            this.emit_event('log', message);
         }
     }
 
@@ -366,10 +366,29 @@ class PRISM {
 
 class Message {
     constructor(data) {
-        this.data = data;
-        this.subject = data.split('\x02')[0].replace('\x01', '');
-        this.messages = data.split('\x02')[1].split('\x03');
-        this.messages[this.messages.length - 1] = this.messages[this.messages.length-1].replace('\x04\x00', '');
+        try {
+            this.data = data;
+            this.subject = data.split('\x02')[0].replace('\x01', '');
+            this.messages = data.split('\x02')[1].split('\x03');
+            this.messages[this.messages.length - 1] = this.messages[this.messages.length-1].replace('\x04\x00', '');
+        } catch (error) {
+            console.error(error)
+            log.error(error);
+        }
+    }
+
+    format(){
+        const messages = this.messages;
+        let message = [];
+        const word = ['Response', 'Admin Alert', 'Game', 'Chat'];
+        for(let i = 0; i < messages.length; i++){
+            if(messages[i] === '') {continue;};
+            if(word.includes(messages[i])) {continue;};
+            if(Math.abs(messages[i]) >= 0) {continue;};
+            message.push(messages[i]);
+        }
+
+        return message.join('\n');
     }
 }
 

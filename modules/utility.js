@@ -45,12 +45,27 @@ function embedMsg(msg = '') {
         .setTimestamp();
 }
 
-function embedLog(msg = '') {
+function embedLog(msg = '',title = 'Server Log', mention = '') {
     return new Discord.MessageEmbed()
-        .setTitle('Server Log')
-        .setDescription('```'+msg+'```')
+        .setTitle(title)
+        .setDescription('```'+msg+'```'+mention)
         .setColor('NOT_QUITE_BLACK')
         .setTimestamp();
+}
+
+function reportPlayer(msg = "", mention = ""){
+    return msg + '\n' + mention;
+}
+
+function makeRoleMentions(rolesId = []) {
+    let roles = [];
+    if(rolesId == undefined || rolesId == null) return;
+    for (let i = 0; i < rolesId.length; i++) {
+        const role = rolesId[i];
+        if(role == undefined || role == null || role == '') {continue;};
+        roles.push(`<@&${role}>`);
+    }
+    return roles.join(' ');
 }
 
 module.exports = {
@@ -59,5 +74,7 @@ module.exports = {
     embedSuccess,
     embedMsg,
     embedLog,
-    getUserFromMention
+    getUserFromMention,
+    makeRoleMentions,
+    reportPlayer
 }

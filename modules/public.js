@@ -7,7 +7,7 @@ const log = require('./logger.js');
 
 const Public = (msg, client) => {
     const split =  msg.content.split(/ +/);
-	const command = split[0];
+	const command = split[0].toLowerCase();
 	const args = split.slice(1);
 
     if (command === 'ping') {

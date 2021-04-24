@@ -5,7 +5,7 @@ const Discord = require('discord.js');
 const { Public } = require("./modules/public.js");
 const { Game } = require("./modules/game.js");
 const { PRISM } = require('./modules/prism.js');
-const { checkRoles, embedLog, embedMsg } = require("./modules/utility.js");
+const { checkRoles, embedLog, embedMsg, makeRoleMentions, reportPlayer } = require("./modules/utility.js");
 const log = require('./modules/logger.js');
 
 const main = () => {
@@ -24,15 +24,25 @@ const main = () => {
 
     client.on('ready', () => {
         console.info(`Logged in as ${client.user.tag}!`);
-        const channel = client.channels.cache.get(process.env.LOG_CHANNEL);
+        const logCh = client.channels.cache.get(process.env.LOG_CHANNEL);
+        const reportCh = client.channels.cache.get(process.env.REPORT_CHANNEL);
 
-        channel.send(embedMsg('Bot is ready!'))
+        logCh.send(embedMsg('Bot is ready!'))
 
         // Log
         log.info('Bot is ready!');
 
-        prism.event.prependListener('log', (messages) => {
-            channel.send(embedLog(messages))
+        prism.event.prependListener('log', (message) => {
+            const msg = message.format();
+
+            if(msg.includes('!r ')){
+                const rolesId = JSON.parse(process.env.MENTION_ROLES).report;
+                const role = makeRoleMentions(rolesId);
+                reportCh.send(reportPlayer('```'+msg+'```', role));
+                return;
+            } 
+            
+            logCh.send(embedLog(msg));
         });     
     });
 
