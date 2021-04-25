@@ -150,28 +150,10 @@ const Game = async (msg, client, prism) => {
         if(!checkRoles(msg)) return;
         // const [sub, ...res] = args;
         prism.send_raw_command('say', args.join(' '));
-        prism.event.once('adminalert', (message) => {
-            // console.log(message);
-            msg.channel.send('```'+message.messages.join('\n')+'```');
-            return;
-        })
-
-        prism.event.once('game', (message) => {
-            // console.log(message);
-            msg.channel.send('```'+message.messages.join('\n')+'```');
-            return;
-        })
-
-        prism.event.once('response', (message) => {
-            // console.log(message);
-            msg.channel.send('```'+message.messages.join('\n')+'```');
-            return;
-        })
-
-        prism.event.once('error', (message) => {
-            msg.channel.send('```'+message.messages.join('\n')+'```');
-            return;
-        });
+		
+        prism.event.onetime(['adminalert', 'game', 'response', 'error'], (message) => {
+			msg.channel.send('```'+message.format()+'```');
+		});
     }
 
     if(command === 'admin'){
@@ -181,29 +163,11 @@ const Game = async (msg, client, prism) => {
 
         if(JSON.parse(process.env.LEVEL2_COMMAND).includes(args[0])) {
             prism.send_raw_command('say', args.join(' '));
-            
-            prism.event.once('adminalert', (message) => {
-                // console.log(message);
-                msg.channel.send('```'+message.messages.join('\n')+'```');
-                return;
-            })
-    
-            prism.event.once('game', (message) => {
-                // console.log(message);
-                msg.channel.send('```'+message.messages.join('\n')+'```');
-                return;
-            })
-    
-            prism.event.once('response', (message) => {
-                // console.log(message);
-                msg.channel.send('```'+message.messages.join('\n')+'```');
-                return;
-            })
-    
-            prism.event.once('error', (message) => {
-                msg.channel.send('```'+message.messages.join('\n')+'```');
-                return;
-            });
+			
+			prism.event.onetime(['adminalert', 'game', 'response', 'error'], (message) => {
+				msg.channel.send('```'+message.format()+'```');
+			});
+
         }
     }
 

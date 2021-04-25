@@ -57,4 +57,52 @@ const main = () => {
     client.login(TOKEN);
 }
 
-main();
+const test = () => {
+	const client  = new Discord.Client();
+
+    const prism = new PRISM();;
+
+    prism.client.once('connect', function() {
+        console.info('Connected to server!')
+        prism.login();
+    })
+
+    prism.client.on('error', (error) => {
+        console.error(error);
+    })
+
+    client.on('ready', () => {
+        console.info(`Logged in as ${client.user.tag}!`);
+        const logCh = client.channels.cache.get(process.env.LOG_CHANNEL);
+        const reportCh = client.channels.cache.get(process.env.REPORT_CHANNEL);
+
+        // logCh.send(embedMsg('Bot is ready!'))
+
+        // Log
+        log.info('Bot is ready!');
+
+        prism.event.prependListener('log', (message) => {
+            const msg = message.format();
+			
+			console.log(message.messages);
+			console.log(msg);
+
+            if(msg.includes('!r ')){
+                const rolesId = JSON.parse(process.env.MENTION_ROLES).report;
+                const role = makeRoleMentions(rolesId);
+                // reportCh.send(reportPlayer('```'+msg+'```', role));
+                return;
+            } 
+            
+            // logCh.send(embedLog(msg));
+        });     
+    });
+	
+	client.login(TOKEN);
+}
+
+if(process.env.MODE == 'development'){
+	test();
+} else {
+	main();
+}

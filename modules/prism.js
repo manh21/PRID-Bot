@@ -3,6 +3,68 @@ const crypto = require('crypto');
 const events = require('events');
 const net = require('net');
 const log = require('./logger.js');
+const EventEmitter = events.EventEmitter;
+
+EventEmitter.prototype.onetime = function(events, handler){
+    // no events, get out!
+    if(! events)
+        return; 
+
+    // Ugly, but helps getting the rest of the function 
+    // short and simple to the eye ... I guess...
+    if(!(events instanceof Array))
+        events = [events];
+
+    var _this = this;
+
+    var cb = function(){
+        events.forEach(function(e){     
+            // This only removes the listener itself 
+            // from all the events that are listening to it
+            // i.e., does not remove other listeners to the same event!
+            _this.removeListener(e, cb); 
+        });
+
+        // This will allow any args you put in xxx.emit('event', ...) to be sent 
+        // to your handler
+        handler.apply(_this, Array.prototype.slice.call(arguments, 0));
+    };
+
+    events.forEach(function(e){ 
+        _this.addListener(e, cb);
+    }); 
+};
+
+EventEmitter.prototype.groups = function(events, handler){
+    // no events, get out!
+    if(! events)
+        return; 
+
+    // Ugly, but helps getting the rest of the function 
+    // short and simple to the eye ... I guess...
+    if(!(events instanceof Array))
+        events = [events];
+
+    var _this = this;
+
+    // A helper function that will generate a handler that 
+    // removes itself when its called
+    var gen_cb = function(event_name){
+        var cb = function(){
+            _this.removeListener(event_name, cb);
+            // This will allow any args you put in 
+            // xxx.emit('event', ...) to be sent 
+            // to your handler
+            handler.apply(_this, Array.prototype.slice.call(arguments, 0));
+        };
+        return cb;
+    };
+
+
+    events.forEach(function(e){ 
+        _this.addListener(e, gen_cb(e));
+    }); 
+};
 
 class PRISM {
     constructor() {
@@ -25,7 +87,7 @@ class PRISM {
         // State
         this.authenticated = false;
         this.COMMAND_CHANNEL = null;
-        this.eventEmitter = new events.EventEmitter();
+        this.eventEmitter = new EventEmitter();
         this.status = false;
 
         this.connect();
@@ -87,7 +149,7 @@ class PRISM {
     }
 
     /**
-     * Send Radlity admin command
+     * Send Reality admin command
      * @param  {...string} args 
      * args should be a list like ["setnext", "kashan", "cq", "std"]
      */
@@ -123,23 +185,25 @@ class PRISM {
        
         switch (subject) {
             case 'login1':
-                this._h_login1(message);
+                this._login1(message);
                 break;
 
             case 'connected':
-                this._h_connected(message);
+                this._connected(message);
                 break;
 
             case 'serverdetails':
-                this._h_serverdetails(message);
+                this._serverdetails(message);
                 break;
 
             case 'updateserverdetails':
+				this._log(message);
                 break;
 
             case 'APIAdminResult':
                 this.emit_event(subject, message.messages);
 				//this._log(message);
+				console.log(message.messages)
                 break;
 
             case 'chat':
@@ -161,11 +225,13 @@ class PRISM {
 
             case 'raconfig':
 				//this._log(message);
+				console.log(message.messages)
                 break;
         
             default:
                 console.log('No parser found: ' + subject);
                 // this._log(message);
+				console.log(message.messages)
                 break;
         }
     }
@@ -234,7 +300,7 @@ class PRISM {
      * SUBJECT HANDLER
      */
 
-    _h_login1(message) {
+    _login1(message) {
         [this.salt, this.server_challange] = message.messages;
         if(this.salt && this.server_challange) {
             this._login2();
@@ -248,7 +314,7 @@ class PRISM {
         this.client_challange = '';
     }
 
-    _h_connected(message) {
+    _connected(message) {
         this.authenticated = true;
         this._log(message);
 		this.emit_event('log', 'Authenticated as Skynet')
@@ -314,7 +380,7 @@ class PRISM {
      * Parse server details message
      * @param {Message} message 
      */
-    _h_serverdetails(message){
+    _serverdetails(message){
         const msg = message.messages;
         const details = {
             'servername'        : msg[0],
@@ -381,13 +447,29 @@ class Message {
         const messages = this.messages;
         let message = [];
         const word = ['Response', 'Admin Alert', 'Game', 'Chat'];
+		
+		loop1:
         for(let i = 0; i < messages.length; i++){
-            if(messages[i] === '') {continue;};
-            if(word.includes(messages[i])) {continue;};
-            if(Math.abs(messages[i]) >= 0) {continue;};
-            message.push(messages[i]);
+			let msg = messages[i];
+			
+            if(msg === '') {continue loop1;};
+            if(word.includes(msg)) {continue loop1;};
+            if(Math.abs(msg) >= 0) {continue loop1;};
+			if(msg.includes('\n')){
+				let msg2 = msg.split('\n');
+				
+				loop2:
+				for(let j = 0; j < msg2.length; j++){
+					if(Math.abs(msg2[j]) >= 0) {continue loop2;};
+					message.push(msg2[j]);
+				}
+				
+				continue loop1;
+			}
+			
+            message.push(msg);
         }
-
+		
         return message.join('\n');
     }
 }
