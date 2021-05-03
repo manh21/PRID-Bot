@@ -1,0 +1,311 @@
+[
+    {
+        "name": "reload",
+        "syntax": "!reload",
+        "example": "!reload",
+        "description": "Reload the current map.",
+        "paramater": []
+    },
+    {
+        "name": "runnext",
+        "syntax": "!runnxt",
+        "example": "!runnext",
+        "description": "Loads the next map instantly. By default this is the next map in the map-list. Make sure to set the next map if you want another one.",
+        "paramater": []
+    },
+    {
+        "name": "setnext",
+        "syntax": "!setnext",
+        "example": "!setnext goose_green cq std",
+        "description": "Set the next map. The map name can be partial (ex. muttrah instead of muttrah_city_2). The gamemode is cq, ins, skirmish, cnc or vehicle. The layer is inf, std, alt or large",
+        "paramater": [
+            "mapname",
+            "gamemode",
+            "layer"
+        ]
+    },
+    {
+        "name": "mapvote",
+        "syntax": "!mapvote",
+        "example": "!mapvote Muttrah Ulyanovsk Carentan",
+        "description": "Create a vote for the next map. This allows the players to give you a better idea of what the players want to run. You should still discuss amongst the active admins which layer, gamemode or map the best options are for the current players online and what you have played before to offer variety to the players. You obviously can use this command for other things then maps. You can also use to vote on the next gamemode, layer or something else. You also don't have to use 3 items, but 3 is the maximum supported.",
+        "paramater": [
+            "mapname1",
+            "mapname2",
+            "mapname3"
+        ]
+    },
+    {
+        "name": "say",
+        "syntax": "!say",
+        "example": "!say No rushing of the first flags",
+        "description": "Say a message as an announcer message to the entire server.",
+        "paramater": [
+            "message"
+        ]
+    },
+    {
+        "name": "sayteam",
+        "syntax": "!sayteam",
+        "example": "!say them Stop camping mainbase",
+        "description": "Say a message as an announcer message to a specific team. Must define if it is only on the admins team (us) or the other team (them). You can also use the team-number (1 or 2).",
+        "paramater": [
+            "us|them",
+            "message"
+        ]
+    },
+    {
+        "name": "message",
+        "syntax": "!message",
+        "example": "!message Camo Stop talking in AllChat",
+        "description": "Send a message a specific message.",
+        "paramater": [
+            "playername",
+            "your_message"
+        ]
+    },
+    {
+        "name": "reload",
+        "syntax": "!reload",
+        "example": "!reload",
+        "description": "Reload the current map.",
+        "paramater": []
+    },
+    {
+        "name": "warn",
+        "syntax": "!warn",
+        "example": "!warn W0lf3k Use English",
+        "description": "Show a warning message to a player.",
+        "paramater": [
+            "playername",
+            "reason"
+        ]
+    },
+    {
+        "name": "kick",
+        "syntax": "!kick",
+        "example": "!kick Outlawz teamkill",
+        "description": "Kick a player. They can rejoin instantly. Make sure to provide a reason for better post actions.",
+        "paramater": [
+            "playername",
+            "reason"
+        ]
+    },
+    {
+        "name": "tempban",
+        "syntax": "!tempban",
+        "example": "!tempban Mineral Probably cheating Way too good",
+        "description": "Ban a player for a pre-defined (see configuration) amount of time. Note that if the server is restarted, the ban is lifted. Make sure to provide a reason for better post actions.",
+        "paramater": [
+            "playername",
+            "reason"
+        ]
+    },
+    {
+        "name": "timeban",
+        "syntax": "!timeban",
+        "example": "!timeban Alon 120 Placing FOB in building",
+        "description": "Ban a player for a specified amount of time. Note that if the server is restarted, the ban is lifted. Make sure to provide a reason for better post actions.",
+        "paramater": [
+            "playername",
+            "time",
+            "reason"
+        ]
+    },
+    {
+        "name": "ban",
+        "syntax": "!ban",
+        "example": "!ban Alon Placing FOB in building",
+        "description": "Ban a player permanently. Adds their PR Account ID to the banlist. Make sure to provide a reason for better post actions.",
+        "paramater": [
+            "playername",
+            "reason"
+        ]
+    },
+    {
+        "name": "tickets",
+        "syntax": "!tickets",
+        "example": "!tickets",
+        "description": "Show the tickets of both teams. Handy for knowing if the map is nearly ending to start a mapvote in time.",
+        "paramater": []
+    },
+    {
+        "name": "kill",
+        "syntax": "!kill",
+        "example": "!kill AncientMan You can't steal that vehicle",
+        "description": "Kills the player. Make sure to provide a reason for better post actions.",
+        "paramater": [
+            "playername",
+            "reason"
+        ]
+    },
+    {
+        "name": "fly",
+        "syntax": "!fly",
+        "example": "!fly Rhino 500",
+        "description": "Move a player up in the air to punish them. This will likely kill them. But it is fun.",
+        "paramater": [
+            "playername",
+            "height"
+        ]
+    },
+    {
+        "name": "hash",
+        "syntax": "!hash",
+        "example": "!hash Mats391",
+        "description": "prints the PR Account ID of a player.",
+        "paramater": [
+            "playername"
+        ]
+    },
+    {
+        "name": "unban",
+        "syntax": "!unban",
+        "example": "!unban",
+        "description": "Removes the latest banned player.",
+        "paramater": []
+    },
+    {
+        "name": "resign",
+        "syntax": "!resign",
+        "example": "!resign rpoxo Read the manual",
+        "description": "Demotes a player that is commander or squad-leader to a regular unassigned role. Make sure to provide a reason for better post actions.",
+        "paramater": [
+            "playername",
+            "reason"
+        ]
+    },
+    {
+        "name": "resignall",
+        "syntax": "!resignall",
+        "example": "!resign them don't create squads yet",
+        "description": "Demotes all players that are commander or squad-leader to a regular unassigned role. Must define if it is only on the admins team (us) or the other team (them).",
+        "paramater": [
+            "us|them",
+            "reason"
+        ]
+    },
+    {
+        "name": "showafk",
+        "syntax": "!showafk",
+        "example": "!showafk",
+        "description": "Shows players that have been unassigned or idle for a long period of time.",
+        "paramater": []
+    },
+    {
+        "name": "switch",
+        "syntax": "!switch",
+        "example": "!switch Yosik next",
+        "description": "Switch a player to the other team. You can define a optional keyword that is either now: switch the player instantly, next: switch player the next map, cancel: cancel a planned team switch. If no additional keyword is provided, the player is switched on the next time he dies.",
+        "paramater": [
+            "playername",
+            "now|next|cancel"
+        ]
+    },
+    {
+        "name": "ab",
+        "syntax": "!ab",
+        "example": "!ab on",
+        "description": "Turn on or off the SmartBalance (also called AutoBalance) system. You can also add a optional keyword first that is either ip: turn on/off the IP balancing to keep players with same IP on separate teams or deathbalance: turn on or off to automatically switch players when the die to balance the teams. To allow these commands to work you need to configure SmartBalance correctly in the configuration file and enable these features.",
+        "paramater": [
+            "ip|deathbalance",
+            "on|off"
+        ]
+    },
+    {
+        "name": "init",
+        "syntax": "!init",
+        "example": "!init",
+        "description": "Reload some of the settings of RealityAdmin.",
+        "paramater": []
+    },
+    {
+        "name": "swapteams",
+        "syntax": "!swapteams",
+        "example": "!swapteams next",
+        "description": "switch all players to go to the other team immediately. You provide an optional keyword that is either next: Swap the teams at the start of next round or cancel: Cancel the planned team swapping next round. If no optional keyword is provided, then the swapping will happen immediately, however this is only possible during the initial briefing period.",
+        "paramater": [
+            "next|cancel"
+        ]
+    },
+    {
+        "name": "scramble",
+        "syntax": "!scramble",
+        "example": "!scramble next",
+        "description": "Scramble all the players between the teams at the start of the next round. You can provide the optional keyword cancel: cancel the planned scrambling of next round.",
+        "paramater": [
+            "next|cancel"
+        ]
+    },
+    {
+        "name": "stopserver",
+        "syntax": "!stopserver",
+        "example": "!stopserver no more admins online",
+        "description": "Stops the server immediately. This is useful for when the last admin leaves. Make sure to use some form of auto-restart script on your Game Server so it can automatically restart.",
+        "paramater": [
+            "reason"
+        ]
+    },
+    {
+        "name": "aa",
+        "syntax": "!aa",
+        "example": "!aa off",
+        "description": "Toggle on the AutoAdmin which automatically punishes team-killing.",
+        "paramater": [
+            "on|off"
+        ]
+    },
+    {
+        "name": "history",
+        "syntax": "!history",
+        "example": "!history",
+        "description": "Prints out a list of previously played maps.",
+        "paramater": []
+    },
+    {
+        "name": "ungrief deployable",
+        "syntax": "!ungrief deployable",
+        "example": "!ungrief deployable rebuild 3",
+        "description": "Show a list of all deployables build and their index with the list keyword. Using the rebuild keyword and supplying the deployable's index then automatically rebuilds that asset.",
+        "paramater": [
+            "list|rebuild",
+            "index"
+        ]
+    },
+    {
+        "name": "ungrief dodvehicle",
+        "syntax": "!ungrief dodvehicle",
+        "example": "!ungrief dodvehicle teleport 7",
+        "description": "Show a list of all vehicles in the combat zone/DOD and their index with the list keyword. Using the destroy keyword and supplying the vehicle's index then automatically kills that vehicle. Using the teleport keyword and the vehicle's index will move it back to main base.",
+        "paramater": [
+            "list|destroy|teleport",
+            "index"
+        ]
+    },
+    {
+        "name": "resetsquads",
+        "syntax": "!resetsquads",
+        "example": "!resetsquads",
+        "description": "This will reset all the squads in an attempt to fix a squad-bug. A notorious bug where players cannot create a new squad even though there are less then 9 squads in total",
+        "paramater": []
+    },
+    {
+        "name": "info",
+        "syntax": "!info",
+        "example": "!info UTurista",
+        "description": "This will how the PR Account ID, PR Account Level, IP and the whitelist status of a player.",
+        "paramater": [
+            "playername"
+        ]
+    },
+    {
+        "name": "ec",
+        "syntax": "!ec",
+        "example": "!ec whitelist 3",
+        "description": "This will control the Entrance Control. With the keyword recent it will print out the players and their index that were recently denied access to your server. With the keyword whitelist and the index of the player you can then permanently add them to your server's whitelist. With the minimum keyword you can set the PR Account Level that is the minimum requirement to join your server by providing the right level index (0,1 or 2). See the explanation above in the Configuration section for more information on this.",
+        "paramater": [
+            "recent|whitelist|minimum",
+            "index"
+        ]
+    }
+]

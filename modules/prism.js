@@ -203,7 +203,7 @@ class PRISM {
             case 'APIAdminResult':
                 this.emit_event(subject, message.messages);
 				//this._log(message);
-				console.log(message.messages)
+				//console.log(message.messages)
                 break;
 
             case 'chat':
@@ -225,13 +225,13 @@ class PRISM {
 
             case 'raconfig':
 				//this._log(message);
-				console.log(message.messages)
+				//console.log(message.messages)
                 break;
         
             default:
                 console.log('No parser found: ' + subject);
                 // this._log(message);
-				console.log(message.messages)
+				//console.log(message.messages)
                 break;
         }
     }
@@ -341,6 +341,7 @@ class PRISM {
         if(this.isGameManagementChat(message)){
             message.messages = message.messages.slice(2);
 			
+			//console.log(message);
             switch (message.messages[0]) {
                 case 'Game':
                     this._man_game(message);
@@ -358,7 +359,7 @@ class PRISM {
                     break;
             
                 default:
-                    console.log(message);
+                    //console.log(message);
                     break;
             }
         }

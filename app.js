@@ -15,7 +15,7 @@ const main = () => {
 
     prism.client.once('connect', function() {
         console.info('Connected to server!')
-        prism.login();
+        //prism.login();
     })
 
     prism.client.on('error', (error) => {
@@ -33,7 +33,13 @@ const main = () => {
         log.info('Bot is ready!');
 
         prism.event.prependListener('log', (message) => {
-            const msg = message.format();
+            let msg;
+
+			try{
+				msg = message.format();
+			} catch(error){
+				msg = message;
+			}
 
             if(msg.includes('!r ')){
                 const rolesId = JSON.parse(process.env.MENTION_ROLES).report;
@@ -46,7 +52,7 @@ const main = () => {
         });     
     });
 
-    client.on('message', async msg => {  
+    client.on('message', msg => {  
         // Public Scope Command
         Public(msg, client);
 
@@ -58,6 +64,7 @@ const main = () => {
 }
 
 const test = () => {
+    console.log('RUNNING TEST MODE')
 	const client  = new Discord.Client();
 
     const prism = new PRISM();;
@@ -84,7 +91,7 @@ const test = () => {
         prism.event.prependListener('log', (message) => {
             const msg = message.format();
 			
-			console.log(message.messages);
+			console.log(message);
 			console.log(msg);
 
             if(msg.includes('!r ')){

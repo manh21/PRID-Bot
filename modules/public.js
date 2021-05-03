@@ -14,6 +14,10 @@ const Public = (msg, client) => {
         msg.reply('pong');
     }
 
+    if (command === 'latancy'){
+        msg.channel.send(`🏓Latency is ${Date.now() - msg.createdTimestamp}ms. API Latency is ${Math.round(client.ws.ping)}ms`);
+    }
+
     if(command === 'av'){
         if(args[0] == null) {
             const imageURL = msg.author.displayAvatarURL();
@@ -62,7 +66,7 @@ const Public = (msg, client) => {
         msg.channel.send(embed);
     }
 
-    if(command === 'horny'){
+    if(msg.content.includes('horny')){
         // https://media.discordapp.net/attachments/407660974389329930/762589822438473748/ezgif-2-8678582ad8cb.gif?width=153&height=153
         // Create the attachment using MessageAttachment
         const attachment = new Discord.MessageAttachment('https://media.discordapp.net/attachments/407660974389329930/762589822438473748/ezgif-2-8678582ad8cb.gif');
@@ -109,6 +113,49 @@ const Public = (msg, client) => {
         // Send the attachment in the message channel
         msg.channel.send(attachment);
     }
+	
+	if (command === 'sms') {
+        const url = 'https://cdn.discordapp.com/attachments/500263112881078272/837629163132157952/sms.gif';
+        const attachment = new Discord.MessageAttachment(url);
+        // Send the attachment in the message channel
+        msg.channel.send(attachment);
+    }
+	
+	if(command === 'fbi') {
+		const url = 'https://cdn.discordapp.com/attachments/543234827407720483/600950504641527820/fbi.jpg';
+		const attachment = new Discord.MessageAttachment(url);
+		msg.channel.send(attachment);
+		
+		try {
+            msg.delete();
+        } catch (error){
+            log.error(error);
+        }
+	}
+	
+	if(command === 'bonk') {
+		const url = 'https://cdn.discordapp.com/attachments/360238813387292674/837624554615734272/bonk.gif';
+		const attachment = new Discord.MessageAttachment(url);
+		msg.channel.send(attachment);
+		
+		try {
+            msg.delete();
+        } catch (error){
+            log.error(error);
+        }
+	}
+	
+	if(msg.content.includes('konto!') || msg.content.includes('kontol')) {
+		const url = 'https://cdn.discordapp.com/attachments/500263112881078272/837625442831695872/kon.gif';
+		const attachment = new Discord.MessageAttachment(url);
+		msg.channel.send(attachment);
+		
+		try {
+            msg.delete();
+        } catch (error){
+            log.error(error);
+        }
+	}
 
     if(command === '!gamecrash') {
         if(!checkRoles(msg)) return;

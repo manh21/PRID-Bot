@@ -1,0 +1,62 @@
+[
+    {
+        "command": "stopserver",
+        "description": "Stop Server PR"
+    },
+    {
+        "command": "startserver",
+        "description": "Start Server PR"
+    },
+    {
+        "command": "u <message>",
+        "description": "say something with bot"
+    },
+    {
+        "command": "status",
+        "description": "Show Status of Server PR"
+    },
+    {
+        "command": "gameinfo <servename>",
+        "description": "Return Server info from PR master server. Default servername is PRID."
+    },
+    {
+        "command": "gameinfo list",
+        "description": "Display a list of all PR server that are currently online."
+    },
+    {
+        "command": "gameinfo <servername> player",
+        "description": "Display a list of player on partivular server."
+    },
+    {
+        "command": "serverdetails",
+        "description": "Display serverdetails of PR Server"
+    },
+    {
+        "command": "pr commands",
+        "description": "List of all available command for prism"
+    },
+    {
+        "command": "pr commands <name>",
+        "description": "Displat command details"
+    },
+    {
+        "command": "pr <reality admin command>",
+        "description": "Send command to Reality Admin"
+    },
+    {
+        "command": "admin",
+        "description": "Get limited acces of Reality Admin Commands in Discord"
+    },
+    {
+        "command": "login",
+        "description": "Login to PRSIM"
+    },
+    {
+        "command": "reconnect",
+        "description": "Reconnect PRISM connection. Use this command after startserver"
+    },
+    {
+        "command": "reload",
+        "description": "WARNING might cause PR Server to Stop !!!. Use this command to reload the bot."
+    }
+]

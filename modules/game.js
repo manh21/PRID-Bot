@@ -8,6 +8,8 @@ require('moment/locale/id');
 
 const { checkRoles, embedError, embedMsg, embedSuccess, getUserFromMention } = require("./utility.js");
 const log = require('./logger.js');
+const realityadmin = require('../data/realityadmin.json');
+const adminCommand = require('../data/admin.json');
 
 const Game = async (msg, client, prism) => {
     if(!msg.content.startsWith(process.env.PREFIX)) return;
@@ -18,6 +20,44 @@ const Game = async (msg, client, prism) => {
 	const args = split.slice(1);
 
     moment.locale('id');
+    
+    if(command === 'help'){
+        if(!checkRoles(msg)) return;
+
+        if(args[0]){
+            let command = adminCommand.find(x => x.command.includes(args[0]));
+            const embed = new Discord.MessageEmbed()
+                .setTitle('Command Details')
+                .setColor('NOT_QUITE_BLACK')
+                .addFields(
+                    {name: 'Command', value: command.command},
+                    {name: 'Description', value: command.description},
+                )
+                .setFooter(`Server Time ${moment().format('LLLL')}`);
+
+            msg.channel.send(embed);
+        } else {
+            let list = {
+                command: [],
+                description: []
+            };
+            for (let i = 0; i < adminCommand.length; i++) {
+                const el = adminCommand[i];
+                list.command.push(el.command);
+                list.description.push(el.description.substring(0, 42));
+            }
+            const embed = new Discord.MessageEmbed()
+                .setTitle('Command List')
+                .setColor('NOT_QUITE_BLACK')
+                .addFields(
+                    {name: 'Command', value: list.command.join('\n'), inline: true},
+                    {name: 'Description', value: list.description.join('\n'), inline: true},
+                )
+                .setFooter(`Server Time ${moment().format('LLLL')}`);
+
+            msg.channel.send(embed);
+        }
+    }
     
     if(command === 'u') {
         if(!checkRoles(msg)) return;
@@ -148,7 +188,64 @@ const Game = async (msg, client, prism) => {
 
     if(command === 'pr'){
         if(!checkRoles(msg)) return;
-        // const [sub, ...res] = args;
+        if(args[0] === 'commands'){
+            let content = {
+                commands: [],
+                examples: []
+            };
+
+            if(args[1]) {
+                let param = [];
+                let com = realityadmin.find(x => x.name.includes(args[1]));
+
+                if(!com) return;
+
+                for (let i = 0; i < com.paramater.length; i++) {
+                    const el = com.paramater[i];
+                    param.push(el);
+                }
+
+                if(param.length == 0){
+                    param.push('None');
+                }
+
+                let syntax = `${com.syntax} ${param.map(x => {if(x == "None") return; return '<'+x+'>';}).join(' ')}`;
+
+                let embed = new Discord.MessageEmbed()
+                    .setTitle('Command Details')
+                    .setColor('NOT_QUITE_BLACK')
+                    .addFields(
+                        {name: 'Name', value: com.name},
+                        {name: 'Syntax', value: syntax},
+                        {name: 'Example', value: com.example},
+                        {name: 'Paramater', value: param.join('\n')}
+                    )
+                    .setDescription(com.description)
+                    .setFooter(`Server Time ${moment().format('LLLL')}`);
+                
+                msg.channel.send(embed);
+            } else {
+                for (let i = 0; i < realityadmin.length; i++) {
+                    const command = realityadmin[i];
+                    content.commands.push(command.name);
+                    content.examples.push(command.example);
+                }
+
+                let embed = new Discord.MessageEmbed()
+                    .setTitle('Command List')
+                    .setColor('NOT_QUITE_BLACK')
+                    .addFields(
+                        {name: 'Command', value: content.commands.join('\n'), inline: true},
+                        {name: 'Examples', value: content.examples.join('\n'), inline: true},
+                    )
+                    .setFooter(`Server Time ${moment().format('LLLL')}`);
+
+                msg.channel.send(embed);
+            }
+
+            return;
+        }
+        
         prism.send_raw_command('say', args.join(' '));
 		
         prism.event.onetime(['adminalert', 'game', 'response', 'error'], (message) => {
@@ -167,8 +264,9 @@ const Game = async (msg, client, prism) => {
 			prism.event.onetime(['adminalert', 'game', 'response', 'error'], (message) => {
 				msg.channel.send('```'+message.format()+'```');
 			});
-
-        }
+        } else {
+			msg.channel.send(embedError('Not authorized'))
+		}
     }
 
     if(command === 'login'){
