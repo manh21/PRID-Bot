@@ -15,7 +15,7 @@ const main = () => {
 
     prism.client.once('connect', function() {
         console.info('Connected to server!')
-        //prism.login();
+        prism.login();
     })
 
     prism.client.on('error', (error) => {
