@@ -11,17 +11,17 @@ function checkRoles(msg) {
 }
 
 function getUserFromMention(mention) {
-	if (!mention) return false;
+    if (!mention) return false;
 
-	if (mention.startsWith('<@') && mention.endsWith('>')) {
-		mention = mention.slice(2, -1);
+    if (mention.startsWith('<@') && mention.endsWith('>')) {
+        mention = mention.slice(2, -1);
 
-		if (mention.startsWith('!')) {
-			mention = mention.slice(1);
-		}
+        if (mention.startsWith('!')) {
+            mention = mention.slice(1);
+        }
 
-		return new Discord.Client().users.cache.get(mention);
-	}
+        return new Discord.Client().users.cache.get(mention);
+    }
 }
 
 function embedError(msg = 'Error') {
@@ -45,7 +45,7 @@ function embedMsg(msg = '') {
         .setTimestamp();
 }
 
-function embedLog(msg = '',title = 'Server Log', mention = '') {
+function embedLog(msg = '', title = 'Server Log', mention = '') {
     return new Discord.MessageEmbed()
         .setTitle(title)
         .setDescription('```'+msg+'```'+mention)
@@ -53,7 +53,7 @@ function embedLog(msg = '',title = 'Server Log', mention = '') {
         .setTimestamp();
 }
 
-function reportPlayer(msg = "", mention = ""){
+function reportPlayer(msg = "", mention = "") {
     return msg + '\n' + mention;
 }
 
@@ -62,7 +62,9 @@ function makeRoleMentions(rolesId = []) {
     if(rolesId == undefined || rolesId == null) return;
     for (let i = 0; i < rolesId.length; i++) {
         const role = rolesId[i];
-        if(role == undefined || role == null || role == '') {continue;};
+        if(role == undefined || role == null || role == '') {
+            continue;
+        }
         roles.push(`<@&${role}>`);
     }
     return roles.join(' ');
@@ -77,4 +79,4 @@ module.exports = {
     getUserFromMention,
     makeRoleMentions,
     reportPlayer
-}
+};

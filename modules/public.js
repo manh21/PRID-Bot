@@ -1,24 +1,24 @@
 require('dotenv').config();
 const Discord = require('discord.js');
-const Fuse = require('fuse.js')
+const Fuse = require('fuse.js');
 
 const { embedError, embedMsg, embedSuccess, getUserFromMention, checkRoles} = require('./utility.js');
 const log = require('./logger.js');
 
 const Public = (msg, client) => {
-    const split =  msg.content.split(/ +/);
-	const command = split[0].toLowerCase();
-	const args = split.slice(1);
+    const split = msg.content.split(/ +/);
+    const command = split[0].toLowerCase();
+    const args = split.slice(1);
 
     if (command === 'ping') {
         msg.reply('pong');
     }
 
-    if (command === 'latancy'){
+    if (command === 'latancy') {
         msg.channel.send(`🏓Latency is ${Date.now() - msg.createdTimestamp}ms. API Latency is ${Math.round(client.ws.ping)}ms`);
     }
 
-    if(command === 'av'){
+    if(command === 'av') {
         if(args[0] == null) {
             const imageURL = msg.author.displayAvatarURL();
             const embed = new Discord.MessageEmbed()
@@ -29,20 +29,22 @@ const Public = (msg, client) => {
 
             msg.channel.send(embed);
             return;
-        };
+        }
 
         let taggedUser;
-        let userMention = getUserFromMention(args[0])
+        let userMention = getUserFromMention(args[0]);
 
-        if(userMention){
-           taggedUser = getUserFromMention(args[0]) 
+        if(userMention) {
+            taggedUser = getUserFromMention(args[0]);
         } else {
             const options = {
                 isCaseSensitive: false,
                 includeScore: true,
                 keys: ['username']
             };
-            const fuse = new Fuse(client.users.cache.map(user => {return {id: user.id, username: user.username}}), options);
+            const fuse = new Fuse(client.users.cache.map(user => {
+                return {id: user.id, username: user.username};
+            }), options);
             taggedUser = fuse.search(args[0]);
             taggedUser = taggedUser[0].item;
             taggedUser = client.users.cache.find(user => user.id == taggedUser.id);
@@ -52,7 +54,7 @@ const Public = (msg, client) => {
         if(!taggedUser) {
             msg.channel.send(embedError(`Couldn't find that user.`));
             return;
-        };
+        }
         // if(taggedUser.bot) return;
 
         const imageURL = taggedUser.displayAvatarURL();
@@ -66,7 +68,7 @@ const Public = (msg, client) => {
         msg.channel.send(embed);
     }
 
-    if(msg.content.includes('horny')){
+    if(msg.content.includes('horny')) {
         // https://media.discordapp.net/attachments/407660974389329930/762589822438473748/ezgif-2-8678582ad8cb.gif?width=153&height=153
         // Create the attachment using MessageAttachment
         const attachment = new Discord.MessageAttachment('https://media.discordapp.net/attachments/407660974389329930/762589822438473748/ezgif-2-8678582ad8cb.gif');
@@ -75,7 +77,7 @@ const Public = (msg, client) => {
 
         try {
             msg.delete();
-        } catch (error){
+        } catch (error) {
             // console.error(error);
             log.error(error);
         }
@@ -102,7 +104,7 @@ const Public = (msg, client) => {
 
         try {
             msg.delete();
-        } catch (error){
+        } catch (error) {
             log.error(error);
         }
     }
@@ -113,49 +115,61 @@ const Public = (msg, client) => {
         // Send the attachment in the message channel
         msg.channel.send(attachment);
     }
-	
-	if (command === 'sms') {
+
+    if (command === 'sms') {
         const url = 'https://cdn.discordapp.com/attachments/500263112881078272/837629163132157952/sms.gif';
         const attachment = new Discord.MessageAttachment(url);
         // Send the attachment in the message channel
         msg.channel.send(attachment);
     }
-	
-	if(command === 'fbi') {
-		const url = 'https://cdn.discordapp.com/attachments/543234827407720483/600950504641527820/fbi.jpg';
-		const attachment = new Discord.MessageAttachment(url);
-		msg.channel.send(attachment);
-		
-		try {
+
+    if(command === 'fbi') {
+        const url = 'https://cdn.discordapp.com/attachments/543234827407720483/600950504641527820/fbi.jpg';
+        const attachment = new Discord.MessageAttachment(url);
+        msg.channel.send(attachment);
+
+        try {
             msg.delete();
-        } catch (error){
+        } catch (error) {
             log.error(error);
         }
-	}
-	
-	if(command === 'bonk') {
-		const url = 'https://cdn.discordapp.com/attachments/360238813387292674/837624554615734272/bonk.gif';
-		const attachment = new Discord.MessageAttachment(url);
-		msg.channel.send(attachment);
-		
-		try {
+    }
+
+    if(command === 'fbi2') {
+        const url = 'https://media.discordapp.net/attachments/819652513196146778/839914347118460938/based.gif';
+        const attachment = new Discord.MessageAttachment(url);
+        msg.channel.send(attachment);
+
+        try {
             msg.delete();
-        } catch (error){
+        } catch (error) {
             log.error(error);
         }
-	}
-	
-	if(msg.content.includes('konto!') || msg.content.includes('kontol')) {
-		const url = 'https://cdn.discordapp.com/attachments/500263112881078272/837625442831695872/kon.gif';
-		const attachment = new Discord.MessageAttachment(url);
-		msg.channel.send(attachment);
-		
-		try {
+    }
+
+    if(command === 'bonk') {
+        const url = 'https://cdn.discordapp.com/attachments/360238813387292674/837624554615734272/bonk.gif';
+        const attachment = new Discord.MessageAttachment(url);
+        msg.channel.send(attachment);
+
+        try {
             msg.delete();
-        } catch (error){
+        } catch (error) {
             log.error(error);
         }
-	}
+    }
+
+    if(msg.content.includes('konto!') || msg.content.includes('kontol')) {
+        const url = 'https://cdn.discordapp.com/attachments/500263112881078272/837625442831695872/kon.gif';
+        const attachment = new Discord.MessageAttachment(url);
+        msg.channel.send(attachment);
+
+        try {
+            msg.delete();
+        } catch (error) {
+            log.error(error);
+        }
+    }
 
     if(command === '!gamecrash') {
         if(!checkRoles(msg)) return;
@@ -164,20 +178,20 @@ const Public = (msg, client) => {
             .setDescription(`Jika anda mengalami crash pada game Project Reality, harap membaca <#815276340461961226> dan berkonsultasi ke <#791343470911422474>. Jangan lupa untuk menyertakan **PRLauncher.log** serta **Support Info**, petunjuk tertera di <#815276340461961226> pula. Kami tidak dapat membantu tanpa kooperasi anda.`);
         msg.channel.send(embed);
     }
-    
-    if(command === '!lmao'){
+
+    if(command === '!lmao') {
         const link = 'https://media.discordapp.net/attachments/500263112881078272/834626048745668608/lol.png';
         const attachment = new Discord.MessageAttachment(link);
         msg.channel.send(attachment);
-        
+
         try {
             msg.delete();
         } catch (error) {
             log.error(error);
         }
     }
-}
+};
 
 module.exports = {
     Public
-}
+};

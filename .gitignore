@@ -124,6 +124,7 @@ dist/
 tmp/
 temp/
 
+test/
 logs/
 
 ### vscode ###

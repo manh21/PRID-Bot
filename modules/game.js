@@ -16,15 +16,15 @@ const Game = async (msg, client, prism) => {
 
     const withoutPrefix = msg.content.slice(process.env.PREFIX.length);
     const split = withoutPrefix.split(/ +/);
-	const command = split[0];
-	const args = split.slice(1);
+    const command = split[0];
+    const args = split.slice(1);
 
     moment.locale('id');
-    
-    if(command === 'help'){
+
+    if(command === 'help') {
         if(!checkRoles(msg)) return;
 
-        if(args[0]){
+        if(args[0]) {
             let command = adminCommand.find(x => x.command.includes(args[0]));
             const embed = new Discord.MessageEmbed()
                 .setTitle('Command Details')
@@ -58,7 +58,7 @@ const Game = async (msg, client, prism) => {
             msg.channel.send(embed);
         }
     }
-    
+
     if(command === 'u') {
         if(!checkRoles(msg)) return;
         let str = '';
@@ -69,7 +69,7 @@ const Game = async (msg, client, prism) => {
 
         try {
             msg.delete();
-        } catch (error){
+        } catch (error) {
             console.error(error);
         }
     }
@@ -81,7 +81,7 @@ const Game = async (msg, client, prism) => {
         exec('pidof prbf2_l64ded', (err, stdout, stderr) => {
             if (err) {
                 //some err occurred
-                console.error(err)
+                console.error(err);
                 msg.channel.send(embedError());
                 log.error(err);
                 return;
@@ -100,7 +100,7 @@ const Game = async (msg, client, prism) => {
         });
     }
 
-    if(command === 'startserver'){
+    if(command === 'startserver') {
         if(!checkRoles(msg)) return;
 
         // cd /home/pr/public && su -c ./start_pr.sh pr
@@ -108,11 +108,11 @@ const Game = async (msg, client, prism) => {
         log.info('Starting PR Server');
         exec(`./start_pr.sh`, {cwd: '/home/pr/public'}, (err, stdout, stderr) => {
             if (err) {
-                console.error(err)
+                console.error(err);
                 msg.channel.send(embedError(err));
                 log.error(err);
             } else {
-                if(stderr){
+                if(stderr) {
                     msg.channel.send(embedError(stderr));
                     log.error(err);
                 }
@@ -122,28 +122,28 @@ const Game = async (msg, client, prism) => {
 
     if(command === 'status') {
         if(!checkRoles(msg)) return;
-        if(!args[0]){
+        if(!args[0]) {
             exec('pidof prbf2_l64ded', (err, stdout, stderr) => {
-                if(err){
+                if(err) {
                     msg.channel.send(embedMsg('Offline'));
                     log.error(err);
                     return;
                 }
 
-                if(stdout){
+                if(stdout) {
                     msg.channel.send(embedMsg('Online'));
                 } else {
                     msg.channel.send(embedMsg('Offline'));
                 }
             });
-        }        
+        }
     }
 
-    if(command === 'gameinfo'){
+    if(command === 'gameinfo') {
         msg.channel.send(await getServerInfo(args));
     }
 
-    if(command === 'serverdetails'){
+    if(command === 'serverdetails') {
         if(!checkRoles(msg)) return;
         prism.get_server_details();
         prism.event.once('serverdetails', (details) => {
@@ -157,7 +157,7 @@ const Game = async (msg, client, prism) => {
                     {name: 'Server Startup Time', value: `${moment.unix(details.serverStartupTime).format('LLLL')}`, inline: true},
                     {name: 'Server Warmup', value: `${moment.duration(details.serverWarmup, 'seconds').humanize()}`, inline: true},
                     {name: 'Server Round Length', value: `${moment.duration(details.serverRoundLength, 'seconds').humanize()}`, inline: true},
-                    )
+                )
                 .addFields(
                     { name: '\u200B', value: '\u200B' },
                     {name: 'Map', value: `${details.map}`, inline: true},
@@ -178,17 +178,17 @@ const Game = async (msg, client, prism) => {
                 )
                 .addFields(
                     { name: '\u200B', value: '\u200B' },
-                    {name: 'Max Players', value: `${details.maxPlayers}`,inline: true},
-                    {name: 'Players', value: `${details.players}`,inline: true},
+                    {name: 'Max Players', value: `${details.maxPlayers}`, inline: true},
+                    {name: 'Players', value: `${details.players}`, inline: true},
                 )
                 .setFooter(`Server Time ${new Date(Date.now()).toUTCString()}`);
             msg.channel.send(embed);
         });
     }
 
-    if(command === 'pr'){
+    if(command === 'pr') {
         if(!checkRoles(msg)) return;
-        if(args[0] === 'commands'){
+        if(args[0] === 'commands') {
             let content = {
                 commands: [],
                 examples: []
@@ -205,11 +205,13 @@ const Game = async (msg, client, prism) => {
                     param.push(el);
                 }
 
-                if(param.length == 0){
+                if(param.length == 0) {
                     param.push('None');
                 }
 
-                let syntax = `${com.syntax} ${param.map(x => {if(x == "None") return; return '<'+x+'>';}).join(' ')}`;
+                let syntax = `${com.syntax} ${param.map(x => {
+                    if(x == "None") return; return '<'+x+'>';
+                }).join(' ')}`;
 
                 let embed = new Discord.MessageEmbed()
                     .setTitle('Command Details')
@@ -222,7 +224,7 @@ const Game = async (msg, client, prism) => {
                     )
                     .setDescription(com.description)
                     .setFooter(`Server Time ${moment().format('LLLL')}`);
-                
+
                 msg.channel.send(embed);
             } else {
                 for (let i = 0; i < realityadmin.length; i++) {
@@ -245,48 +247,48 @@ const Game = async (msg, client, prism) => {
 
             return;
         }
-        
+
         prism.send_raw_command('say', args.join(' '));
-		
+
         prism.event.onetime(['adminalert', 'game', 'response', 'error'], (message) => {
-			msg.channel.send('```'+message.format()+'```');
-		});
+            msg.channel.send('```'+message.format()+'```');
+        });
     }
 
-    if(command === 'admin'){
+    if(command === 'admin') {
         if(!msg.member.roles.cache.some(role => JSON.parse(process.env.LEVEL2_ROLE).includes(role.name)) ) {
             return;
         }
 
         if(JSON.parse(process.env.LEVEL2_COMMAND).includes(args[0])) {
             prism.send_raw_command('say', args.join(' '));
-			
-			prism.event.onetime(['adminalert', 'game', 'response', 'error'], (message) => {
-				msg.channel.send('```'+message.format()+'```');
-			});
+
+            prism.event.onetime(['adminalert', 'game', 'response', 'error'], (message) => {
+                msg.channel.send('```'+message.format()+'```');
+            });
         } else {
-			msg.channel.send(embedError('Not authorized'))
-		}
+            msg.channel.send(embedError('Not authorized'));
+        }
     }
 
-    if(command === 'login'){
+    if(command === 'login') {
         if(!checkRoles(msg)) return;
         prism.login();
     }
 
-    if(command === 'reconnect'){
+    if(command === 'reconnect') {
         if(!checkRoles(msg)) return;
         msg.channel.send(embedSuccess('Reconneting PRISM'));
-		
+
         setTimeout(() => {
-			prism.disconnect();
-			setTimeout(() => {
-				prism.reconnect();
-			}, 1000); 
-		}, 1000);        
+            prism.disconnect();
+            setTimeout(() => {
+                prism.reconnect();
+            }, 1000);
+        }, 1000);
     }
 
-    if(command === 'reload'){
+    if(command === 'reload') {
         if(!checkRoles(msg)) return;
 
         // cd /home/pr/public && su -c ./start_pr.sh pr
@@ -294,11 +296,11 @@ const Game = async (msg, client, prism) => {
         log.info('Reloading PM2 Services');
         exec(`pm2 reload all`, {}, (err, stdout, stderr) => {
             if (err) {
-                console.error(err)
+                console.error(err);
                 msg.channel.send(embedError(err));
                 log.error(err);
             } else {
-                if(stderr){
+                if(stderr) {
                     msg.channel.send(embedError(stderr));
                     log.error(stderr);
                 }
@@ -307,7 +309,7 @@ const Game = async (msg, client, prism) => {
     }
 };
 
-async function getServerInfo(args = []){
+async function getServerInfo(args = []) {
     try {
         let result;
         const response = await axios.get('https://servers.realitymod.com/api/serverinfo');
@@ -320,8 +322,10 @@ async function getServerInfo(args = []){
             let players;
             let map;
             result = response.data.servers;
-            
-            list = result.map(server => {return `${server.properties.hostname.split(/ +/).slice(2).join(' ')} ${server.properties.password == 1 ? ':lock:' : ''}`});
+
+            list = result.map(server => {
+                return `${server.properties.hostname.split(/ +/).slice(2).join(' ')} ${server.properties.password == 1 ? ':lock:' : ''}`;
+            });
             list = list.join('\n');
 
             players = result.map(server => server.properties.numplayers);
@@ -329,7 +333,7 @@ async function getServerInfo(args = []){
 
             map = result.map(server => server.properties.mapname);
             map = map.join('\n');
-            
+
             return new Discord.MessageEmbed()
                 .setTitle('Game Info')
                 .setColor('NOT_QUITE_BLACK')
@@ -341,7 +345,7 @@ async function getServerInfo(args = []){
                 .setFooter(`Server Time ${moment().format('LLLL')}`);
         }
 
-        if(args[0]){
+        if(args[0]) {
             const options = {
                 isCaseSensitive: false,
                 includeScore: true,
@@ -366,7 +370,7 @@ async function getServerInfo(args = []){
                 teamOne = 'Tidak ada player';
             }
 
-            if(teamTwo == ''){
+            if(teamTwo == '') {
                 teamTwo = 'Tidak ada player';
             }
 
@@ -374,7 +378,7 @@ async function getServerInfo(args = []){
                 .setTitle('Game Info')
                 .setColor('NOT_QUITE_BLACK')
                 .addFields(
-                    {name: 'Player List', value: result.properties.hostname,},
+                    {name: 'Player List', value: result.properties.hostname, },
                     {name: 'Team 1', value: teamOne, inline: true},
                     {name: 'Team 2', value: teamTwo, inline: true},
                 )
@@ -383,7 +387,7 @@ async function getServerInfo(args = []){
         }
 
         result = result.properties;
-        
+
         return new Discord.MessageEmbed()
             .setTitle('Game Info')
             .setColor('NOT_QUITE_BLACK')
@@ -407,4 +411,4 @@ async function getServerInfo(args = []){
 
 module.exports = {
     Game
-}
+};

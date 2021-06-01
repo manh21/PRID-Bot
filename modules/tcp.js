@@ -16,17 +16,17 @@ const client = new net.Socket();
 // });
 
 class TCPClient {
-	constructor(host, port){
-		this.host = host;
-		this.port = port;
+    constructor(host, port) {
+        this.host = host;
+        this.port = port;
 
-		client.connect(this.port, this.host);
+        client.connect(this.port, this.host);
 
-		this.onConnect();
-	}
+        this.onConnect();
+    }
 
-	onConnect() {
-		client.on('connect',function(){
+    onConnect() {
+        client.on('connect', function() {
             console.log('Client: connection established with server');
 
             console.log('---------client details -----------------');
@@ -40,7 +40,7 @@ class TCPClient {
 
         });
 
-        client.on('drain', function(){
+        client.on('drain', function() {
             console.log("DRAIN");
         });
 
@@ -51,12 +51,12 @@ class TCPClient {
             // client.end();
         });
 
-        client.on('end', function(){
+        client.on('end', function() {
             console.log("END");
         });
-	}
+    }
 
-	setEncoding() {
+    setEncoding() {
         console.log("setEncoding");
         client.setEncoding('utf8');
     }
@@ -76,5 +76,5 @@ class TCPClient {
 }
 
 module.exports = {
-	TCPClient
-}
+    TCPClient
+};

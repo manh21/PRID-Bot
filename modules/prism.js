@@ -5,70 +5,68 @@ const net = require('net');
 const log = require('./logger.js');
 const EventEmitter = events.EventEmitter;
 
-EventEmitter.prototype.onetime = function(events, handler){
+EventEmitter.prototype.onetime = function(events, handler) {
     // no events, get out!
     if(! events)
-        return; 
+        return;
 
-    // Ugly, but helps getting the rest of the function 
+    // Ugly, but helps getting the rest of the function
     // short and simple to the eye ... I guess...
     if(!(events instanceof Array))
         events = [events];
 
     var _this = this;
 
-    var cb = function(){
-        events.forEach(function(e){     
-            // This only removes the listener itself 
+    var cb = function() {
+        events.forEach(function(e) {
+            // This only removes the listener itself
             // from all the events that are listening to it
             // i.e., does not remove other listeners to the same event!
-            _this.removeListener(e, cb); 
+            _this.removeListener(e, cb);
         });
 
-        // This will allow any args you put in xxx.emit('event', ...) to be sent 
+        // This will allow any args you put in xxx.emit('event', ...) to be sent
         // to your handler
         handler.apply(_this, Array.prototype.slice.call(arguments, 0));
     };
 
-    events.forEach(function(e){ 
+    events.forEach(function(e) {
         _this.addListener(e, cb);
-    }); 
+    });
 };
 
-EventEmitter.prototype.groups = function(events, handler){
+EventEmitter.prototype.groups = function(events, handler) {
     // no events, get out!
     if(! events)
-        return; 
+        return;
 
-    // Ugly, but helps getting the rest of the function 
+    // Ugly, but helps getting the rest of the function
     // short and simple to the eye ... I guess...
     if(!(events instanceof Array))
         events = [events];
 
     var _this = this;
 
-    // A helper function that will generate a handler that 
+    // A helper function that will generate a handler that
     // removes itself when its called
-    var gen_cb = function(event_name){
-        var cb = function(){
+    var gen_cb = function(event_name) {
+        var cb = function() {
             _this.removeListener(event_name, cb);
-            // This will allow any args you put in 
-            // xxx.emit('event', ...) to be sent 
+            // This will allow any args you put in
+            // xxx.emit('event', ...) to be sent
             // to your handler
             handler.apply(_this, Array.prototype.slice.call(arguments, 0));
         };
         return cb;
     };
 
-
-    events.forEach(function(e){ 
+    events.forEach(function(e) {
         _this.addListener(e, gen_cb(e));
-    }); 
+    });
 };
 
 class PRISM {
     constructor() {
-        const self = this;
         // NET
         this.port = process.env.PORT;
         this.host = process.env.HOST;
@@ -91,17 +89,17 @@ class PRISM {
         this.status = false;
 
         this.connect();
-		this.after();
+        this.after();
     }
-	
-	after() {
-		let self = this;
-		this.client.on('end', () => {
+
+    after() {
+        let self = this;
+        this.client.on('end', () => {
             self.emit_event('log', 'Disconnected from PRISM Server');
             self.status = false;
             log.info('Disconnected form PRISM Server');
         });
-        
+
         this.client.on('data', function(data) {
             //console.log("RECEIVED "+data.toString());
             self.messages(data.toString());
@@ -111,46 +109,46 @@ class PRISM {
             self.status = true;
             self.emit_event('log', 'Connected to PRISM Server');
             log.info('Connected to PRISM Server');
-        })
-		
-		this.client.on('error', (data) => {
-			self.emit_event('log', data);
-            log.error(data);
-		})
-	}
+        });
 
-    connect(){
+        this.client.on('error', (data) => {
+            self.emit_event('log', data);
+            log.error(data);
+        });
+    }
+
+    connect() {
         this.client = net.createConnection(process.env.PORT, process.env.HOST);
     }
 
-	reconnect() {
-		let self = this;
-		this.client.removeAllListeners();
-		this.client = net.createConnection(process.env.PORT, process.env.HOST);
-		
-		this.client.on('error', err => {
-			console.error(err)
+    reconnect() {
+        let self = this;
+        this.client.removeAllListeners();
+        this.client = net.createConnection(process.env.PORT, process.env.HOST);
+
+        this.client.on('error', err => {
+            console.error(err);
             log.error(err);
-		})
-		
-		this.client.once('connect', function() {
-			self.emit_event('log', 'Connectd to PRISM Server');
-			console.info('Connected to server!')
-			self.after();
-			self.login();
-		})
+        });
+
+        this.client.once('connect', function() {
+            self.emit_event('log', 'Connectd to PRISM Server');
+            console.info('Connected to server!');
+            self.after();
+            self.login();
+        });
         log.info('Reconnecting to PRISM Server');
     }
 
     disconnect() {
-		this.authenticated = false;
+        this.authenticated = false;
         this.client.end();
         log.info('Disconnected form PRISM Server');
     }
 
     /**
      * Send Reality admin command
-     * @param  {...string} args 
+     * @param  {...string} args
      * args should be a list like ["setnext", "kashan", "cq", "std"]
      */
     send_command(...args) {
@@ -166,11 +164,11 @@ class PRISM {
 
         const msg = data.split(DELIMITER, 1);
 
-        if(data.includes(DELIMITER) && (msg[1] == undefined || msg[1] == null) ){
+        if(data.includes(DELIMITER) && (msg[1] == undefined || msg[1] == null) ) {
             this.parse_command(msg[0]);
         } else if(data.includes(DELIMITER) == false) {
             this.set_input_buffer(data);
-        } else if(data.includes(DELIMITER) && msg[1].includes(DELIMITER) == false){
+        } else if(data.includes(DELIMITER) && msg[1].includes(DELIMITER) == false) {
             this.parse_command(msg[0]);
             this.set_input_buffer(msg[1]);
         } else if (data.includes(DELIMITER) && msg[1].includes(DELIMITER)) {
@@ -179,10 +177,10 @@ class PRISM {
         }
     }
 
-    parse_command(command){
+    parse_command(command) {
         const message = new Message(command);
         const subject = message.subject;
-       
+
         switch (subject) {
             case 'login1':
                 this._login1(message);
@@ -197,13 +195,13 @@ class PRISM {
                 break;
 
             case 'updateserverdetails':
-				this._log(message);
+                this._log(message);
                 break;
 
             case 'APIAdminResult':
                 this.emit_event(subject, message.messages);
-				//this._log(message);
-				//console.log(message.messages)
+                //this._log(message);
+                //console.log(message.messages)
                 break;
 
             case 'chat':
@@ -211,27 +209,27 @@ class PRISM {
                 break;
 
             case 'success':
-				this._log(message);
+                this._log(message);
                 break;
 
             case 'error':
                 this.emit_event('error', message);
-				this._log(message);
+                this._log(message);
                 break;
 
             case 'errorcritical':
-				this._log(message);
+                this._log(message);
                 break;
 
             case 'raconfig':
-				//this._log(message);
-				//console.log(message.messages)
+                //this._log(message);
+                //console.log(message.messages)
                 break;
-        
+
             default:
                 console.log('No parser found: ' + subject);
                 // this._log(message);
-				//console.log(message.messages)
+                //console.log(message.messages)
                 break;
         }
     }
@@ -246,7 +244,7 @@ class PRISM {
         this.input_buffer = "";
     }
 
-    send_output_buffer(){
+    send_output_buffer() {
         if(!this.client) return;
         const client = this.client;
 
@@ -257,7 +255,7 @@ class PRISM {
         }
     }
 
-    get_server_details(){
+    get_server_details() {
         this.send_raw_command("serverdetailsalways");
     }
 
@@ -269,10 +267,10 @@ class PRISM {
 
     login(username = this.username, password = this.password) {
         if(this.authenticated) {
-			this.emit_event('log', 'already authenticated!')
-			return
-		};
-        const self = this;
+            this.emit_event('log', 'already authenticated!');
+            return;
+        }
+
         // Cryptographically Secure Pseudorandom Number Generator
         const csrpng = parseInt(crypto.randomBytes(8).toString('hex'), 16);
 
@@ -281,18 +279,18 @@ class PRISM {
         this.send_raw_command("login1", "1", username, this.client_challange);
     }
 
-    auth_digest(username, password_hash, salt, client_challange, server_challange){
+    auth_digest(username, password_hash, salt, client_challange, server_challange) {
         const salt_pass = salt + '\x01' + password_hash;
         const salted_hash = crypto.createHash('sha1').update(salt_pass.toString('utf-8')).digest('hex');
         const res = [username, client_challange, server_challange, salted_hash].join('\x03').toString('utf-8');
         return crypto.createHash('sha1').update(res).digest('hex');
     }
-    
+
     get event() {
         return this.eventEmitter;
     }
 
-    emit_event(subject,...data){
+    emit_event(subject, ...data) {
         this.eventEmitter.emit(subject, ...data);
     }
 
@@ -309,7 +307,7 @@ class PRISM {
 
     _login2() {
         const digest = this.auth_digest(this.username, this.password_hash, this.salt, this.client_challange, this.server_challange);
-        this.send_raw_command('login2', digest)
+        this.send_raw_command('login2', digest);
         this.password_hash = '';
         this.client_challange = '';
     }
@@ -317,7 +315,7 @@ class PRISM {
     _connected(message) {
         this.authenticated = true;
         this._log(message);
-		this.emit_event('log', 'Authenticated as Skynet')
+        this.emit_event('log', 'Authenticated as Skynet');
     }
 
     _log(message, queue = false, channel_id = null) {
@@ -325,39 +323,39 @@ class PRISM {
         //     channel_id = this.COMMAND_CHANNEL;
         // }
 
-        if(message instanceof Message){
+        if(message instanceof Message) {
             this.emit_event('log', message);
         }
     }
 
-    isGameManagementChat(message){
+    isGameManagementChat(message) {
         if(message.subject != 'chat') return false;
         if(message.messages.length < 3) return false;
         if(message.messages[2].includes('Game') || message.messages[2].includes('Admin Alert') || message.messages[2].includes('Response')) return true;
         return false;
     }
 
-    _chat(message){
-        if(this.isGameManagementChat(message)){
+    _chat(message) {
+        if(this.isGameManagementChat(message)) {
             message.messages = message.messages.slice(2);
-			
-			//console.log(message);
+
+            //console.log(message);
             switch (message.messages[0]) {
                 case 'Game':
                     this._man_game(message);
-					this._log(message);
+                    this._log(message);
                     break;
 
                 case 'Admin Alert':
                     this._man_adminalert(message);
-					this._log(message);
+                    this._log(message);
                     break;
 
                 case 'Response':
                     this._man_response(message);
-					this._log(message);
+                    this._log(message);
                     break;
-            
+
                 default:
                     //console.log(message);
                     break;
@@ -365,23 +363,23 @@ class PRISM {
         }
     }
 
-    _man_game(message){
+    _man_game(message) {
         this.emit_event('game', message);
     }
 
-    _man_adminalert(message){
+    _man_adminalert(message) {
         this.emit_event('adminalert', message);
     }
-    
-    _man_response(message){
+
+    _man_response(message) {
         this.emit_event('response', message);
     }
 
     /**
      * Parse server details message
-     * @param {Message} message 
+     * @param {Message} message
      */
-    _serverdetails(message){
+    _serverdetails(message) {
         const msg = message.messages;
         const details = {
             'servername'        : msg[0],
@@ -402,19 +400,19 @@ class PRISM {
             'tickets1'          : msg[15],
             'tickets2'          : msg[16],
             'rconUsers'         : msg[17],
-        }
+        };
 
         const layers = {
             '16': 'inf',
             '32': 'alt',
             '64': 'std',
             '128': 'large',
-        }
+        };
 
-        // details["serverStartupTime"] = 
+        // details["serverStartupTime"] =
         // details["serverWarmup"] = str(float(details["serverWarmup"])/60) + " minutes"
         // details["serverRoundLength"] = str(float(details["serverRoundLength"])/60) + " minutes"
-        details["layer"] = layers[details["layer"]]
+        details["layer"] = layers[details["layer"]];
         // details["timeStarted"] = datetime.datetime.fromtimestamp(float(details["timeStarted"])).strftime("%Y-%m-%d-T%H:%M:%S")
 
         // if(details['status'] != 0){
@@ -439,42 +437,44 @@ class Message {
             this.messages = data.split('\x02')[1].split('\x03');
             this.messages[this.messages.length - 1] = this.messages[this.messages.length-1].replace('\x04\x00', '');
         } catch (error) {
-            console.error(error)
+            console.error(error);
             log.error(error);
         }
     }
 
-    format(){
+    format() {
+        const word = ['Response', 'Admin Alert', 'Game', 'Chat'];
         const messages = this.messages;
         let message = [];
-        const word = ['Response', 'Admin Alert', 'Game', 'Chat'];
-		
-		loop1:
-        for(let i = 0; i < messages.length; i++){
-			let msg = messages[i];
-			
-            if(msg === '') {continue loop1;};
-            if(word.includes(msg)) {continue loop1;};
-            if(Math.abs(msg) >= 0) {continue loop1;};
-			if(msg.includes('\n')){
-				let msg2 = msg.split('\n');
-				
-				loop2:
-				for(let j = 0; j < msg2.length; j++){
-					if(Math.abs(msg2[j]) >= 0) {continue loop2;};
-					message.push(msg2[j]);
-				}
-				
-				continue loop1;
-			}
-			
+
+        loop1:
+        for(let i = 0; i < messages.length; i++) {
+            let msg = messages[i];
+
+            if(msg === '' || word.includes(msg) || Math.abs(msg) >= 0) {
+                continue loop1;
+            }
+            if(msg.includes('\n')) {
+                let msg2 = msg.split('\n');
+
+                loop2:
+                for(let j = 0; j < msg2.length; j++) {
+                    if(Math.abs(msg2[j]) >= 0) {
+                        continue loop2;
+                    }
+                    message.push(msg2[j]);
+                }
+
+                continue loop1;
+            }
+
             message.push(msg);
         }
-		
+
         return message.join('\n');
     }
 }
 
 module.exports = {
     PRISM
-}
+};
