@@ -195,7 +195,7 @@ class PRISM {
                 break;
 
             case 'updateserverdetails':
-                this._log(message);
+                // this._log(message);
                 break;
 
             case 'APIAdminResult':
@@ -318,11 +318,7 @@ class PRISM {
         this.emit_event('log', 'Authenticated as Skynet');
     }
 
-    _log(message, queue = false, channel_id = null) {
-        // if(channel_id){
-        //     channel_id = this.COMMAND_CHANNEL;
-        // }
-
+    _log(message) {
         if(message instanceof Message) {
             this.emit_event('log', message);
         }

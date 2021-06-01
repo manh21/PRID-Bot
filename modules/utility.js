@@ -1,5 +1,6 @@
 require('dotenv').config();
 const Discord = require('discord.js');
+const log = require('./logger.js');
 
 function checkRoles(msg) {
     // Check if they have one of many roles
@@ -70,6 +71,24 @@ function makeRoleMentions(rolesId = []) {
     return roles.join(' ');
 }
 
+function sendMsg(channle, msg) {
+    try {
+        channle.send(msg);
+    } catch (error) {
+        console.error(error);
+        log.error(error);
+    }
+}
+
+function deleteMsg(msg) {
+    try {
+        msg.delete();
+    } catch (error) {
+        console.error(error);
+        log.error(error);
+    }
+}
+
 module.exports = {
     checkRoles,
     embedError,
@@ -78,5 +97,7 @@ module.exports = {
     embedLog,
     getUserFromMention,
     makeRoleMentions,
-    reportPlayer
+    reportPlayer,
+    sendMsg,
+    deleteMsg
 };

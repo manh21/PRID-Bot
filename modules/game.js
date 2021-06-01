@@ -6,7 +6,7 @@ const Fuse = require('fuse.js');
 const moment = require('moment');
 require('moment/locale/id');
 
-const { checkRoles, embedError, embedMsg, embedSuccess, getUserFromMention } = require("./utility.js");
+const { checkRoles, embedError, embedMsg, embedSuccess, sendMsg, deleteMsg } = require("./utility.js");
 const log = require('./logger.js');
 const realityadmin = require('../data/realityadmin.json');
 const adminCommand = require('../data/admin.json');
@@ -35,7 +35,7 @@ const Game = async (msg, client, prism) => {
                 )
                 .setFooter(`Server Time ${moment().format('LLLL')}`);
 
-            msg.channel.send(embed);
+            sendMsg(msg.channel, embed);
         } else {
             let list = {
                 command: [],
@@ -55,7 +55,7 @@ const Game = async (msg, client, prism) => {
                 )
                 .setFooter(`Server Time ${moment().format('LLLL')}`);
 
-            msg.channel.send(embed);
+            sendMsg(msg.channel, embed);
         }
     }
 
@@ -65,13 +65,9 @@ const Game = async (msg, client, prism) => {
         for (let i = 0; i < args.length; i++) {
             str += ` ${args[i]}`;
         }
-        msg.channel.send(str);
 
-        try {
-            msg.delete();
-        } catch (error) {
-            console.error(error);
-        }
+        sendMsg(msg.channel, str);
+        deleteMsg(msg);
     }
 
     if(command === 'stopserver') {
@@ -90,7 +86,7 @@ const Game = async (msg, client, prism) => {
                 console.log(`stderr: ${stderr}`);
                 let processID = stdout.trim();
 
-                exec(`kill 15 ${processID}`, (err, stdout, stderr) => {
+                exec(`kill 15 ${processID}`, (err) => {
                     if (err) console.error(err);
                     msg.channel.send(embedSuccess());
                     log.info('PR Server Stopped');
@@ -123,7 +119,7 @@ const Game = async (msg, client, prism) => {
     if(command === 'status') {
         if(!checkRoles(msg)) return;
         if(!args[0]) {
-            exec('pidof prbf2_l64ded', (err, stdout, stderr) => {
+            exec('pidof prbf2_l64ded', (err, stdout) => {
                 if(err) {
                     msg.channel.send(embedMsg('Offline'));
                     log.error(err);
@@ -309,13 +305,12 @@ const Game = async (msg, client, prism) => {
     }
 };
 
-async function getServerInfo(args = []) {
+const getServerInfo = async (args = []) => {
     try {
         let result;
         const response = await axios.get('https://servers.realitymod.com/api/serverinfo');
 
-        const serverId = '979e55faf3851606dc796ab4ca730c661172cd66';
-        const countryFlag = 'ID';
+        const serverId = process.env.PR_SERVER_ID;
 
         if(args[0] === 'list') {
             let list;
@@ -355,7 +350,7 @@ async function getServerInfo(args = []) {
             result = fuse.search(args[0]);
             result = result[0].item;
         } else {
-            result = response.data.servers.find(server => server.serverId == serverId || server.countryFlag == countryFlag);
+            result = response.data.servers.find(server => server.serverId == serverId);
         }
 
         if(args[1] === 'player') {
@@ -404,10 +399,10 @@ async function getServerInfo(args = []) {
             .setFooter(`Server Time ${moment().format('LLLL')}`);
 
     } catch (error) {
-        return embedError(error);
         log.error(error);
+        return embedError(error);
     }
-}
+};
 
 module.exports = {
     Game
