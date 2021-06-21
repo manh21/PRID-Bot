@@ -4,6 +4,7 @@ const Discord = require('discord.js');
 
 const { Public } = require("./modules/public.js");
 const { Game } = require("./modules/game.js");
+const { PR } = require("./modules/pr.js");
 const { PRISM } = require('./modules/prism.js');
 const { embedLog, embedMsg, makeRoleMentions, reportPlayer, sendMsg, deleteMsg } = require("./modules/utility.js");
 const log = require('./modules/logger.js');
@@ -30,10 +31,10 @@ const main = () => {
         const mapCh = client.channels.cache.get(process.env.MAP_ROTATION_CHANNEL);
         const serverId = process.env.PR_SERVER_ID;
 
-        logCh.send(embedMsg('Bot is ready!'));
+        logCh.send(embedMsg('Main Bot is ready!'));
 
         // Log
-        log.info('Bot is ready!');
+        log.info('Main Bot is ready!');
 
         prism.event.prependListener('log', (message) => {
             let msg;
@@ -164,8 +165,114 @@ const test = () => {
     client.login(TOKEN);
 };
 
-if(process.env.MODE == 'development') {
-    test();
-} else {
-    main();
+const game = async () => {
+    const client = new Discord.Client();
+
+    client.on('ready', () => {
+        console.info(`Logged in as ${client.user.tag}!`);
+        const logCh = client.channels.cache.get(process.env.LOG_CHANNEL);
+
+        logCh.send(embedMsg('Game Server Bot is ready!'));
+
+        // Log
+        log.info('Game Server Bot is ready!');
+    });
+
+    client.on('message', msg => {
+        PR(msg);
+    });
+
+    client.login(TOKEN);
+};
+
+const both = async () => {
+    const client = new Discord.Client();
+
+    const prism = new PRISM();
+
+    prism.client.once('connect', function() {
+        console.info('Connected to server!');
+        prism.login();
+    });
+
+    prism.client.on('error', (error) => {
+        console.error(error);
+    });
+
+    client.on('ready', () => {
+        console.info(`Logged in as ${client.user.tag}!`);
+        const logCh = client.channels.cache.get(process.env.LOG_CHANNEL);
+        const reportCh = client.channels.cache.get(process.env.REPORT_CHANNEL);
+        const mapCh = client.channels.cache.get(process.env.MAP_ROTATION_CHANNEL);
+        const serverId = process.env.PR_SERVER_ID;
+
+        logCh.send(embedMsg('Bot is ready! with mode Both'));
+
+        // Log
+        log.info('Bot is ready! with mode Both');
+
+        prism.event.prependListener('log', (message) => {
+            let msg;
+
+            try{
+                msg = message.format();
+            } catch(error) {
+                msg = message;
+            }
+
+            if(msg.includes('!r ')) {
+                const rolesId = JSON.parse(process.env.MENTION_ROLES).report;
+                const role = makeRoleMentions(rolesId);
+                const ctx = reportPlayer('```'+msg+'```', role);
+                sendMsg(reportCh, ctx);
+                return;
+            }
+
+            if(msg.includes('Round is ending...')) {
+                setTimeout(async () => {
+                    const url = `https://www.realitymod.com/prspy/prbf2/${serverId}`;
+                    const options = {
+                        delay: 10,
+                        element: "#prspy-page-contents section .ancient-prspy-data-server .details",
+                        width: 1960,
+                        heigth: 540,
+                        scaleFactor: 4
+                    };
+                    const image = await captureWebsite.buffer(url, options);
+                    const attachment = new Discord.MessageAttachment(image);
+
+                    sendMsg(mapCh, attachment);
+                }, 300000);
+            }
+
+            sendMsg(logCh, embedLog(msg));
+        });
+    });
+
+    client.on('message', msg => {
+        // Public Scope Command
+        Public(msg, client);
+
+        // Gameserver Scope Command
+        Game(msg, client, prism);
+
+        PR(msg);
+    });
+
+    client.login(TOKEN);
+};
+
+switch (process.env.MODE) {
+    case 'development':
+        test();
+        break;
+    case 'main':
+        main();
+        break;
+    case 'game':
+        game();
+        break;
+    case 'both':
+        both();
+        break;
 }
