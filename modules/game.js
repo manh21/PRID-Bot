@@ -127,7 +127,7 @@ const Game = async (msg, client, prism) => {
 
             if(args[1]) {
                 let param = [];
-                let com = realityadmin.find(x => x.name.includes(args[1]));
+                let com = realityadmin.find(x => x.name == args[1]);
 
                 if(!com) return;
 
