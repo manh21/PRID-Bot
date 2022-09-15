@@ -1,6 +1,7 @@
 require('dotenv').config();
 const TOKEN = process.env.TOKEN;
 const Discord = require('discord.js');
+const { DiscordTogether } = require('discord-together');
 
 const { Public } = require("./modules/public.js");
 const { Game } = require("./modules/game.js");
@@ -172,6 +173,23 @@ const both = async () => {
     client.login(TOKEN);
 };
 
+function beta() {
+    const client = new Discord.Client();
+    client.discordTogether = new DiscordTogether(client);
+
+    client.on('message', async message => { // 'message' for Discord.js v12
+        if (message.content === 'start lettertile') {
+            if(message.member.voice.channel) {
+                client.discordTogether.createTogetherCode(message.member.voice.channel.id, 'lettertile').then(async invite => {
+                    return message.channel.send(`${invite.code}`);
+                });
+            }
+        }
+    });
+
+    client.login(TOKEN);
+}
+
 switch (process.env.MODE) {
     case 'development':
         test();
@@ -184,5 +202,8 @@ switch (process.env.MODE) {
         break;
     case 'both':
         both();
+        break;
+    case 'beta':
+        beta();
         break;
 }
