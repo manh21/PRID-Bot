@@ -37,7 +37,7 @@
     },
     {
         "command": "pr commands <name>",
-        "description": "Displat command details"
+        "description": "Display command details"
     },
     {
         "command": "pr <reality admin command>",

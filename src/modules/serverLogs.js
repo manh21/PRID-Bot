@@ -1,7 +1,7 @@
 require('dotenv').config();
 const Discord = require('discord.js');
 
-const { sendMsg, embedLog, makeRoleMentions, reportPlayer } = require("./utility.js");
+const { sendMsg, embedLog, makeRoleMentions, reportPlayer, getBoundingClientRect} = require("./utility.js");
 const captureWebsite = require('capture-website');
 
 const ServerLogs = async (message, client) => {
@@ -27,25 +27,50 @@ const ServerLogs = async (message, client) => {
         return;
     }
 
+    // Round is ending...
     if(msg.includes('Round is ending...')) {
         setTimeout(async () => {
             const url = `https://www.realitymod.com/prspy/prbf2/${serverId}`;
-            const options = {
-                delay: 10,
-                element: "#prspy-page-contents section .ancient-prspy-data-server .details",
-                width: 1960,
-                heigth: 540,
-                scaleFactor: 4
-            };
-            const image = await captureWebsite.buffer(url, options);
-            const attachment = new Discord.MessageAttachment(image);
+            const elements = '#prspy-page-contents section .ancient-prspy-data-server .details';
+            const browser = await puppeteer.connect({
+                browserWSEndpoint: process.env.BROWSER_ENDPOINT,
+            });
+        
+            const page = await browser.newPage();
+
+            // Set Options
+            await page.setViewport({ 
+                width: 1960, 
+                height: 540,
+                deviceScaleFactor: 4,
+            });
+            await page.setBypassCSP(true);
+	        await page.setJavaScriptEnabled(true)
+
+            // Go to URL
+            await page.goto(url, { waitUntil: 'networkidle0' });
+
+            await page.waitForSelector(elements, {
+                visible: true,
+                timeout: 60 * 1000,
+            });
+
+            const clip = await page.$eval(elements, getBoundingClientRect);
+
+            const buffer = await page.screenshot({
+                clip: clip
+            });
+            
+            await browser.close();
+
+            const attachment = new Discord.MessageAttachment(buffer);
 
             sendMsg(mapCh, attachment);
         }, 300000);
     }
 
     // Perma BAN
-    if(msg.includes('HAS BEEN  BANNED')) {
+    if(msg.includes('HAS BEEN BANNED')) {
         msg = msg.split('\n');
 
         const name = msg[0].match(/(.*)(?=HAS BEEN)/gm).trim();

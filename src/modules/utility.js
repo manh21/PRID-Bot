@@ -89,6 +89,11 @@ function deleteMsg(msg) {
     }
 }
 
+const getBoundingClientRect = element => {
+	const {top, left, height, width, x, y} = element.getBoundingClientRect();
+	return {top, left, height, width, x, y};
+};
+
 module.exports = {
     checkRoles,
     embedError,
@@ -99,5 +104,6 @@ module.exports = {
     makeRoleMentions,
     reportPlayer,
     sendMsg,
-    deleteMsg
+    deleteMsg,
+    getBoundingClientRect
 };
