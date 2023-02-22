@@ -2,7 +2,6 @@ require('dotenv').config();
 const Discord = require('discord.js');
 
 const { sendMsg, embedLog, makeRoleMentions, reportPlayer, getBoundingClientRect} = require("./utility.js");
-const captureWebsite = require('capture-website');
 
 const ServerLogs = async (message, client) => {
     let msg;

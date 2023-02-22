@@ -218,26 +218,6 @@ const Game = async (msg, client, prism) => {
             }, 1000);
         }, 1000);
     }
-
-    if(command === 'reload') {
-        if(!checkRoles(msg)) return;
-
-        // cd /home/pr/public && su -c ./start_pr.sh pr
-        msg.channel.send(embedSuccess('PM2 Reload All!'));
-        log.info('Reloading PM2 Services');
-        exec(`pm2 reload all`, {}, (err, stdout, stderr) => {
-            if (err) {
-                console.error(err);
-                msg.channel.send(embedError(err));
-                log.error(err);
-            } else {
-                if(stderr) {
-                    msg.channel.send(embedError(stderr));
-                    log.error(stderr);
-                }
-            }
-        });
-    }
 };
 
 const getServerInfo = async (args = []) => {
