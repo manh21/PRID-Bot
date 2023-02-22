@@ -126,21 +126,20 @@ const Game = async (msg, client, prism) => {
             };
 
             if(args[1]) {
-                let param = [];
+                let params = [];
                 let com = realityadmin.find(x => x.name == args[1]);
 
                 if(!com) return;
 
-                for (let i = 0; i < com.paramater.length; i++) {
-                    const el = com.paramater[i];
-                    param.push(el);
+                for (const parm of com.paramater) {
+                    params.push(parm);
                 }
 
-                if(param.length == 0) {
-                    param.push('None');
+                if(params.length == 0) {
+                    params.push('None');
                 }
 
-                let syntax = `${com.syntax} ${param.map(x => {
+                let syntax = `${com.syntax} ${params.map(x => {
                     if(x == "None") return; return '<'+x+'>';
                 }).join(' ')}`;
 
@@ -151,7 +150,7 @@ const Game = async (msg, client, prism) => {
                         {name: 'Name', value: com.name},
                         {name: 'Syntax', value: syntax},
                         {name: 'Example', value: com.example},
-                        {name: 'Paramater', value: param.join('\n')}
+                        {name: 'Paramater', value: params.join('\n')}
                     )
                     .setDescription(com.description)
                     .setFooter(`Server Time ${moment().format('LLLL')}`);
