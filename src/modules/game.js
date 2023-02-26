@@ -1,6 +1,5 @@
 require('dotenv').config();
 const Discord = require('discord.js');
-const { exec } = require('child_process');
 const axios = require('axios');
 const Fuse = require('fuse.js');
 const moment = require('moment');
@@ -8,8 +7,8 @@ require('moment/locale/id');
 
 const { checkRoles, embedError, embedSuccess, sendMsg, deleteMsg } = require("./utility.js");
 const log = require('./logger.js');
-const realityadmin = require('../../data/realityadmin.json');
-const adminCommand = require('../../data/admin.json');
+const realityadmin = require('../data/realityadmin.json');
+const adminCommand = require('../data/admin.json');
 
 const Game = async (msg, client, prism) => {
     if(!msg.content.startsWith(process.env.PREFIX)) return;

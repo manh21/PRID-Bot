@@ -4,7 +4,7 @@
   "description": "realitymod server tools",
   "main": "src/app.js",
   "dependencies": {
-    "@manh21/prism": "^0.1.1",
+    "@manh21/prism": "^0.1.2",
     "app-root-path": "^3.0.0",
     "axios": "^0.21.1",
     "discord.js": "^12.5.3",

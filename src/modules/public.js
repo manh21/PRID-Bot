@@ -4,6 +4,7 @@ const Fuse = require('fuse.js');
 
 const { embedError, getUserFromMention, checkRoles, deleteMsg, sendMsg} = require('./utility.js');
 const log = require('./logger.js');
+const { Tag } = require('./tag.js');
 
 const Public = (msg, client) => {
     const split = msg.content.split(/ +/);
@@ -101,69 +102,9 @@ const Public = (msg, client) => {
         deleteMsg(msg);
     }
 
-    if (command === 'oha') {
-        // https://cdn.discordapp.com/attachments/623432857720717312/623477443323494410/ohayou.jpg
-        const attachment = new Discord.MessageAttachment('https://cdn.discordapp.com/attachments/623432857720717312/623477443323494410/ohayou.jpg');
+    Tag(msg)
 
-        // Send the attachment in the message channel
-        sendMsg(msg.channel, attachment);
-    }
-
-    if (command === 'sms') {
-        const url = 'https://cdn.discordapp.com/attachments/500263112881078272/837629163132157952/sms.gif';
-        const attachment = new Discord.MessageAttachment(url);
-
-        // Send the attachment in the message channel
-        sendMsg(msg.channel, attachment);
-    }
-
-    if(command === 'fbi') {
-        const url = 'https://cdn.discordapp.com/attachments/543234827407720483/600950504641527820/fbi.jpg';
-        const attachment = new Discord.MessageAttachment(url);
-
-        sendMsg(msg.channel, attachment);
-        deleteMsg(msg);
-    }
-
-    if(command === 'fbi2') {
-        const url = 'https://media.discordapp.net/attachments/819652513196146778/839914347118460938/based.gif';
-        const attachment = new Discord.MessageAttachment(url);
-
-        sendMsg(msg.channel, attachment);
-        deleteMsg(msg);
-    }
-
-    if(command === 'bonk') {
-        const url = 'https://cdn.discordapp.com/attachments/360238813387292674/837624554615734272/bonk.gif';
-        const attachment = new Discord.MessageAttachment(url);
-
-        sendMsg(msg.channel, attachment);
-        deleteMsg(msg);
-    }
-
-    if(msg.content.includes('konto!') || msg.content.includes('kontol')) {
-        const url = 'https://cdn.discordapp.com/attachments/500263112881078272/837625442831695872/kon.gif';
-        const attachment = new Discord.MessageAttachment(url);
-
-        sendMsg(msg.channel, attachment);
-        deleteMsg(msg);
-    }
-
-    if(command === '!gamecrash') {
-        if(!checkRoles(msg)) return;
-        const embed = new Discord.MessageEmbed()
-            .setTitle('Game Crash')
-            .setDescription(`Jika anda mengalami crash pada game Project Reality, harap membaca <#815276340461961226> dan berkonsultasi ke <#791343470911422474>. Jangan lupa untuk menyertakan **PRLauncher.log** serta **Support Info**, petunjuk tertera di <#815276340461961226> pula. Kami tidak dapat membantu tanpa kooperasi anda.`);
-        msg.channel.send(embed);
-    }
-
-    if(command === '!lmao') {
-        const link = 'https://media.discordapp.net/attachments/500263112881078272/834626048745668608/lol.png';
-        const attachment = new Discord.MessageAttachment(link);
-
-        sendMsg(msg.channel, attachment);
-        deleteMsg(msg);
-    }
+    
 };
 
 module.exports = {

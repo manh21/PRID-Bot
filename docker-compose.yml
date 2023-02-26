@@ -1,0 +1,24 @@
+version: '3.3'
+
+services:
+  wpu_bot:
+    image: manh21/prid_bot
+    restart: unless-stopped
+    environment:
+      - TOKEN=${TOKEN}
+      - PREFIX=${PREFIX}
+      - LOG_CHANNEL=${LOG_CHANNEL}
+      - REPORT_CHANNEL=${REPORT_CHANNEL}
+      - MAP_ROTATION_CHANNEL=${MAP_ROTATION_CHANNEL}
+      - BANKICK_CHANNEL=${BANKICK_CHANNEL}
+      - MENTION_ROLES=${MENTION_ROLES}
+      - ROLE=${ROLE}
+      - LEVEL2_ROLE=${LEVEL2_ROLE}
+      - LEVEL2_COMMAND=${LEVEL2_COMMAND}
+      - PRISM_HOST=${PRISM_HOST}
+      - PRISM_PORT=${PRISM_PORT}
+      - PRISM_USERNAME=${PRISM_USERNAME}
+      - PRISM_PASSWORD=${PRISM_PASSWORD}
+      - PR_SERVER_ID=${PR_SERVER_ID}
+      - MODE=${MODE}
+      - BROWSER_ENDPOINT=${BROWSER_ENDPOINT}
