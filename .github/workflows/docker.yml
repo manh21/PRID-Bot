@@ -24,4 +24,4 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           push: true
-          tags: manh21/prid_bot:latest
+          tags: manh21/PRID-Bot:latest
