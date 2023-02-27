@@ -2,7 +2,7 @@ version: '3.3'
 
 services:
   wpu_bot:
-    image: manh21/PRID-Bot
+    image: manh21/prid_bot
     restart: unless-stopped
     environment:
       - TOKEN=${TOKEN}
