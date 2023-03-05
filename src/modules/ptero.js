@@ -32,8 +32,14 @@ const restart = async () => {
     await client.servers.setPowerState(PTERODACTYL_SERVER_ID, 'restart');
 }
 
+const status = async () => {
+    const server = await client.servers.get(PTERODACTYL_SERVER_ID);
+    return server.status;
+}
+
 module.exports = {
     start,
     stop,
-    restart
+    restart,
+    status
 }

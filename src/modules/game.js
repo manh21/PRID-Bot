@@ -222,18 +222,32 @@ const Game = async (msg, client, prism) => {
         if(!checkRoles(msg)) return;
         
         ptero.start();
+
+        msg.channel.send(embedSuccess('Server Starting'));
     }
 
     if(command === 'stopserver') {
         if(!checkRoles(msg)) return;
         
         ptero.stop();
+
+        msg.channel.send(embedSuccess('Server Stopping'));
     }
 
     if(command === 'restartserver') {
         if(!checkRoles(msg)) return;
         
         ptero.restart();
+
+        msg.channel.send(embedSuccess('Server Restarting'));
+    }
+
+    if(command === 'status') {
+        if(!checkRoles(msg)) return;
+        
+        const status = await ptero.status();
+
+        msg.channel.send(embedSuccess(`Server Status: ${status}`));
     }
 };
 
