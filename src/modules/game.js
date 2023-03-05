@@ -60,14 +60,18 @@ const Game = async (msg, client, prism) => {
     }
 
     if(command === 'u') {
-        if(!checkRoles(msg)) return;
-        let str = '';
-        for (let i = 0; i < args.length; i++) {
-            str += ` ${args[i]}`;
-        }
+        try {
+            if(!checkRoles(msg)) return;
+            let str = '';
+            for (let i = 0; i < args.length; i++) {
+                str += ` ${args[i]}`;
+            }
 
-        sendMsg(msg.channel, str);
-        deleteMsg(msg);
+            sendMsg(msg.channel, str);
+            deleteMsg(msg);
+        } catch (error) {
+            console.error(error);
+        }   
     }
 
     if(command === 'gameinfo') {
@@ -75,46 +79,50 @@ const Game = async (msg, client, prism) => {
     }
 
     if(command === 'serverdetails') {
-        if(!checkRoles(msg)) return;
-        prism.get_server_details();
-        prism.event.once('serverdetails', (details) => {
-            const embed = new Discord.MessageEmbed()
-                .setTitle('Server Details')
-                .setColor('NOT_QUITE_BLACK')
-                .addFields(
-                    {name: 'Server Name', value: `${details.servername}`, inline: true},
-                    {name: 'Server IP', value: `${details.serverIP}`, inline: true},
-                    {name: 'Server PORT', value: `${details.serverPort}`, inline: true},
-                    {name: 'Server Startup Time', value: `${moment(details.serverStartupTime, 'YYYY-MM-DD HH:mm:ss').format('LLLL')}`, inline: true},
-                    {name: 'Server Warmup', value: `${details.serverWarmup}`, inline: true},
-                    {name: 'Server Round Length', value: `${details.serverRoundLength}`, inline: true},
-                )
-                .addFields(
-                    { name: '\u200B', value: '\u200B' },
-                    {name: 'Map', value: `${details.map}`, inline: true},
-                    {name: 'Game Mode', value: `${details.mode}`, inline: true},
-                    {name: 'Layer', value: `${details.layer}`, inline: true},
-                    {name: 'Time Started', value: `${moment(details.timeStarted, 'YYYY-MM-DD HH:mm:ss').format('LLLL')}`, inline: true},
-                    {name: 'Online Duration', value: `${moment(details.serverStartupTime, 'YYYY-MM-DD HH:mm:ss').fromNow()}`, inline: true},
-                )
-                .addFields(
-                    { name: '\u200B', value: '\u200B' },
-                    {name: 'Team 1', value: `${details.team1}`, inline: true},
-                    {name: 'Team 2', value: `${details.team2}`, inline: true},
-                )
-                .addFields(
-                    { name: '\u200B', value: '\u200B' },
-                    {name: 'Tickets Team 1', value: `${details.tickets1}`, inline: true},
-                    {name: 'Tickets Team 2', value: `${details.tickets2}`, inline: true},
-                )
-                .addFields(
-                    { name: '\u200B', value: '\u200B' },
-                    {name: 'Max Players', value: `${details.maxPlayers}`, inline: true},
-                    {name: 'Players', value: `${details.players}`, inline: true},
-                )
-                .setFooter(`Server Time ${new Date(Date.now()).toUTCString()}`);
-            msg.channel.send(embed);
-        });
+        try {
+            if(!checkRoles(msg)) return;
+            prism.get_server_details();
+            prism.event.once('serverdetails', (details) => {
+                const embed = new Discord.MessageEmbed()
+                    .setTitle('Server Details')
+                    .setColor('NOT_QUITE_BLACK')
+                    .addFields(
+                        {name: 'Server Name', value: `${details.servername || 'NaN'}`, inline: true},
+                        {name: 'Server IP', value: `${details.serverIP || 'NaN'}`, inline: true},
+                        {name: 'Server PORT', value: `${details.serverPort || 'NaN'}`, inline: true},
+                        {name: 'Server Startup Time', value: `${moment(details.serverStartupTime || 'NaN', 'YYYY-MM-DD HH:mm:ss').format('LLLL')}`, inline: true},
+                        {name: 'Server Warmup', value: `${details.serverWarmup || 'NaN'}`, inline: true},
+                        {name: 'Server Round Length', value: `${details.serverRoundLength || 'NaN'}`, inline: true},
+                    )
+                    .addFields(
+                        { name: '\u200B', value: '\u200B' },
+                        {name: 'Map', value: `${details.map || 'NaN'}`, inline: true},
+                        {name: 'Game Mode', value: `${details.mode || 'NaN'}`, inline: true},
+                        {name: 'Layer', value: `${details.layer || 'NaN'}`, inline: true},
+                        {name: 'Time Started', value: `${moment(details.timeStarted || 'NaN', 'YYYY-MM-DD HH:mm:ss').format('LLLL')}`, inline: true},
+                        {name: 'Online Duration', value: `${moment(details.serverStartupTime || 'NaN', 'YYYY-MM-DD HH:mm:ss').fromNow()}`, inline: true},
+                    )
+                    .addFields(
+                        { name: '\u200B', value: '\u200B' },
+                        {name: 'Team 1', value: `${details.team1 || 'NaN'}`, inline: true},
+                        {name: 'Team 2', value: `${details.team2 || 'NaN'}`, inline: true},
+                    )
+                    .addFields(
+                        { name: '\u200B', value: '\u200B' },
+                        {name: 'Tickets Team 1', value: `${details.tickets1 || 'NaN'}`, inline: true},
+                        {name: 'Tickets Team 2', value: `${details.tickets2 || 'NaN'}`, inline: true},
+                    )
+                    .addFields(
+                        { name: '\u200B', value: '\u200B' },
+                        {name: 'Max Players', value: `${details.maxPlayers || 'NaN'}`, inline: true},
+                        {name: 'Players', value: `${details.players || 'NaN'}`, inline: true},
+                    )
+                    .setFooter(`Server Time ${new Date(Date.now()).toUTCString()}`);
+                msg.channel.send(embed);
+            });
+        } catch (error) {
+            console.error(error);
+        }
     }
 
     if(command === 'pr') {
