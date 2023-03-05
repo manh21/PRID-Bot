@@ -5,6 +5,7 @@ const Fuse = require('fuse.js');
 const moment = require('moment');
 require('moment/locale/id');
 
+const ptero = require('./ptero.js');
 const { checkRoles, embedError, embedSuccess, sendMsg, deleteMsg } = require("./utility.js");
 const log = require('./logger.js');
 const realityadmin = require('../data/realityadmin.json');
@@ -215,6 +216,24 @@ const Game = async (msg, client, prism) => {
                 prism.reconnect();
             }, 1000);
         }, 1000);
+    }
+
+    if(command === 'startserver') {
+        if(!checkRoles(msg)) return;
+        
+        ptero.start();
+    }
+
+    if(command === 'stopserver') {
+        if(!checkRoles(msg)) return;
+        
+        ptero.stop();
+    }
+
+    if(command === 'restartserver') {
+        if(!checkRoles(msg)) return;
+        
+        ptero.restart();
     }
 };
 

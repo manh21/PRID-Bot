@@ -4,6 +4,7 @@
   "description": "realitymod server tools",
   "main": "src/app.js",
   "dependencies": {
+    "@devnote-dev/pterojs": "^2.2.1",
     "@manh21/prism": "^0.1.2",
     "app-root-path": "^3.0.0",
     "axios": "^0.21.1",
