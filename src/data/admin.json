@@ -8,6 +8,10 @@
         "description": "Start Server PR"
     },
     {
+        "command": "restartserver",
+        "description": "Restart Server PR"
+    },
+    {
         "command": "u <message>",
         "description": "say something with bot"
     },
