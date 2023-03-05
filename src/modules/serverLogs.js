@@ -8,11 +8,12 @@ const ServerLogs = async (message, client) => {
 
     try{
         msg = message.format();
+        console.log(msg)
     } catch(error) {
         msg = message;
     }
 
-    const bankickCh = client.channels.cache.get(process.env.BANKICK_CHANNEL);
+    const serverLogCh = client.channels.cache.get(process.env.SERVER_LOG_CHANNEL);
     const logCh = client.channels.cache.get(process.env.LOG_CHANNEL);
     const reportCh = client.channels.cache.get(process.env.REPORT_CHANNEL);
     const mapCh = client.channels.cache.get(process.env.MAP_ROTATION_CHANNEL);
@@ -68,6 +69,47 @@ const ServerLogs = async (message, client) => {
         }, 300000);
     }
 
+    // Vote finished
+    if(msg.includes('Vote finished:')) {
+        const mapData = msg.match(/(?<=Vote finished: )(.*)(?=\\n)/gm);
+        const maps = mapData.split('|');
+        
+        const embed = new Discord.MessageEmbed()
+            .setTitle("Map Vote Results")
+            .addFields(
+                {name: 'Map:', value: map},
+            )
+            .setColor('PURPLE')
+            .setTimestamp();
+
+        for (const map of maps) {
+            const data = map.trim().split(' ');
+            const mapName = data[0];
+            const votes = data[1];
+
+            embed.addField(mapName, votes);
+        }
+
+        sendMsg(serverLogCh, embed);
+    }
+
+    // Set Next Map
+    if(msg.includes('Next map set to:')) {
+        const map = msg[0].match(/(?<=Next map set to: )(.*)(?=\\n)/gm);
+        const performed = msg[0].replace(/(.*)-/gm, "").trim();
+
+        const embed = new Discord.MessageEmbed()
+            .setTitle("SETNEXT")
+            .addFields(
+                {name: 'Map:', value: map},
+                {name: 'Performed By:', value: performed},
+            )
+            .setColor('TEAL')
+            .setTimestamp();
+
+        sendMsg(serverLogCh, embed);
+    }
+
     // Perma BAN
     if(msg.includes('HAS BEEN BANNED')) {
         msg = msg.split('\n');
@@ -88,7 +130,7 @@ const ServerLogs = async (message, client) => {
             .setColor('RED')
             .setTimestamp();
 
-        sendMsg(bankickCh, embed);
+        sendMsg(serverLogCh, embed);
     }
 
     // Temp BAN
@@ -111,7 +153,7 @@ const ServerLogs = async (message, client) => {
             .setColor('RED')
             .setTimestamp();
 
-        sendMsg(bankickCh, embed);
+        sendMsg(serverLogCh, embed);
     }
 
     // Time BAN
@@ -134,7 +176,7 @@ const ServerLogs = async (message, client) => {
             .setColor('RED')
             .setTimestamp();
 
-        sendMsg(bankickCh, embed);
+        sendMsg(serverLogCh, embed);
     }
 
     // Kicked
@@ -156,8 +198,10 @@ const ServerLogs = async (message, client) => {
             .setColor('YELLOW')
             .setTimestamp();
 
-        sendMsg(bankickCh, embed);
+        sendMsg(serverLogCh, embed);
     }
+
+    if(msg.includes('No parser found')) return;
 
     sendMsg(logCh, embedLog(msg));
 };
