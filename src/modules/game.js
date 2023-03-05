@@ -85,17 +85,17 @@ const Game = async (msg, client, prism) => {
                     {name: 'Server Name', value: `${details.servername}`, inline: true},
                     {name: 'Server IP', value: `${details.serverIP}`, inline: true},
                     {name: 'Server PORT', value: `${details.serverPort}`, inline: true},
-                    {name: 'Server Startup Time', value: `${moment.unix(details.serverStartupTime).format('LLLL')}`, inline: true},
-                    {name: 'Server Warmup', value: `${moment.duration(details.serverWarmup, 'seconds').humanize()}`, inline: true},
-                    {name: 'Server Round Length', value: `${moment.duration(details.serverRoundLength, 'seconds').humanize()}`, inline: true},
+                    {name: 'Server Startup Time', value: `${moment(details.serverStartupTime, 'YYYY-MM-DD HH:mm:ss').format('LLLL')}`, inline: true},
+                    {name: 'Server Warmup', value: `${details.serverWarmup}`, inline: true},
+                    {name: 'Server Round Length', value: `${details.serverRoundLength}`, inline: true},
                 )
                 .addFields(
                     { name: '\u200B', value: '\u200B' },
                     {name: 'Map', value: `${details.map}`, inline: true},
                     {name: 'Game Mode', value: `${details.mode}`, inline: true},
                     {name: 'Layer', value: `${details.layer}`, inline: true},
-                    {name: 'Time Started', value: `${moment.unix(details.timeStarted).format('LLLL')}`, inline: true},
-                    {name: 'Online Duration', value: `${moment.unix(details.serverStartupTime).fromNow()}`, inline: true},
+                    {name: 'Time Started', value: `${moment(details.timeStarted, 'YYYY-MM-DD HH:mm:ss').format('LLLL')}`, inline: true},
+                    {name: 'Online Duration', value: `${moment(details.serverStartupTime, 'YYYY-MM-DD HH:mm:ss').fromNow()}`, inline: true},
                 )
                 .addFields(
                     { name: '\u200B', value: '\u200B' },
