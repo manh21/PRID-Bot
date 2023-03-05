@@ -5,18 +5,20 @@ const Discord = require('discord.js');
 const {Public} = require("./modules/public.js");
 const {Game} = require("./modules/game.js");
 const { sendMsg, embedMsg } = require('./modules/utility');
+const { ServerLogs } = require('./modules/serverLogs.js');
 
 const PRISM = require('@manh21/prism').default;
 
 const client = new Discord.Client();
-const prism = new PRISM(
-    process.env.PRISM_PORT,
-    process.env.PRISM_HOST,
-    process.env.PRISM_USERNAME,
-    process.env.PRISM_PASSWORD
-);
 
 const main = () => {
+    const prism = new PRISM(
+        process.env.PRISM_PORT,
+        process.env.PRISM_HOST,
+        process.env.PRISM_USERNAME,
+        process.env.PRISM_PASSWORD
+    );
+
     client.on('message', msg => {
         // Public Scope Command
         Public(msg, client);
@@ -31,6 +33,14 @@ const main = () => {
         const logChannel = client.channels.cache.get(process.env.LOG_CHANNEL);
 
         logChannel.send(embedMsg('Bot is online!'));
+
+        prism.login();
+
+        prism.event.on('log', (log) => {
+            console.log(log)
+
+            ServerLogs(log, client)
+        })
     });
 
     client.login(TOKEN);
