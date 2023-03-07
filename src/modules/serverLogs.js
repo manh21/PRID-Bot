@@ -2,6 +2,7 @@ require('dotenv').config();
 const Discord = require('discord.js');
 
 const { sendMsg, embedLog, makeRoleMentions, reportPlayer, getBoundingClientRect} = require("./utility.js");
+const puppeteer = require('puppeteer-core');
 
 const ServerLogs = async (message, client) => {
     let msg;
