@@ -37,8 +37,6 @@ const main = () => {
         prism.login();
 
         prism.event.on('log', (log) => {
-            console.log(log)
-
             ServerLogs(log, client)
         })
     });
