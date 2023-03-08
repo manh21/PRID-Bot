@@ -9,7 +9,6 @@ const ServerLogs = async (message, client) => {
 
     try{
         msg = message.format();
-        console.log(msg)
     } catch(error) {
         msg = message;
     }
@@ -96,14 +95,12 @@ const ServerLogs = async (message, client) => {
 
     // Set Next Map
     if(msg.includes('Next map set to:')) {
-        const map = msg[0].match(/(?<=Next map set to: )(.*)(?=\\n)/gm);
-        const performed = msg[0].replace(/(.*)-/gm, "").trim();
+        const map = msg.match(/(?<=Next map set to: )(.*)/gm);
 
         const embed = new Discord.MessageEmbed()
             .setTitle("SETNEXT")
             .addFields(
                 {name: 'Map:', value: map},
-                {name: 'Performed By:', value: performed},
             )
             .setColor('TEAL')
             .setTimestamp();
@@ -115,9 +112,9 @@ const ServerLogs = async (message, client) => {
     if(msg.includes('HAS BEEN BANNED')) {
         msg = msg.split('\n');
 
-        const name = msg[0].match(/(.*)(?=HAS BEEN)/gm).trim();
-        const reason = msg[0].match(/(?<=BANNED,)(.*)(?=-)/gm).trim();
-        const performed = msg[0].replace(/(.*)-/gm, "").trim();
+        const name = msg.match(/(.*)(?=HAS BEEN)/gm).trim();
+        const reason = msg.match(/(?<=BANNED,)(.*)(?=-)/gm).trim();
+        const performed = msg.replace(/(.*)-/gm, "").trim();
 
         const embed = new Discord.MessageEmbed()
             .setTitle("Banned")
@@ -138,9 +135,9 @@ const ServerLogs = async (message, client) => {
     if(msg.includes('HAS BEEN TEMP BANNED')) {
         msg = msg.split('\n');
 
-        const name = msg[0].match(/(.*)(?=HAS BEEN)/gm).trim();
-        const reason = msg[0].match(/(?<=BANNED,)(.*)(?=-)/gm).trim();
-        const performed = msg[0].replace(/(.*)-/gm, "").trim();
+        const name = msg.match(/(.*)(?=HAS BEEN)/gm).trim();
+        const reason = msg.match(/(?<=BANNED,)(.*)(?=-)/gm).trim();
+        const performed = msg.replace(/(.*)-/gm, "").trim();
 
         const embed = new Discord.MessageEmbed()
             .setTitle("Banned")
@@ -161,9 +158,9 @@ const ServerLogs = async (message, client) => {
     if(msg.includes('HAS BEEN TIME BANNED')) {
         msg = msg.split('\n');
 
-        const name = msg[0].match(/(.*)(?=HAS BEEN)/gm).trim();
-        const reason = msg[0].match(/(?<=BANNED,)(.*)(?=-)/gm).trim();
-        const performed = msg[0].replace(/(.*)-/gm, "").trim();
+        const name = msg.match(/(.*)(?=HAS BEEN)/gm).trim();
+        const reason = msg.match(/(?<=BANNED,)(.*)(?=-)/gm).trim();
+        const performed = msg.replace(/(.*)-/gm, "").trim();
 
         const embed = new Discord.MessageEmbed()
             .setTitle("Banned")
@@ -186,7 +183,7 @@ const ServerLogs = async (message, client) => {
 
         const name = msg[1].macth(/(.*)(?=has been kicked,)/gm).trim();
         const reason = msg[1].match(/(?<=has been kicked,)(.*)(?=\[)/gm).trim();
-        const performed = msg[0].trim();
+        const performed = msg.trim();
 
         const embed = new Discord.MessageEmbed()
             .setTitle("Kicked")
