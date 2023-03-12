@@ -71,14 +71,11 @@ const ServerLogs = async (message, client) => {
 
     // Vote finished
     if(msg.includes('Vote finished:')) {
-        const mapData = msg.match(/(?<=Vote finished: )(.*)(?=\\n)/gm);
-        const maps = mapData.split('|');
+        const mapData = msg.match(/(?<=Vote finished: )(.*)/gm);
+        const maps = mapData ? mapData.split('|') : [];
         
         const embed = new Discord.MessageEmbed()
             .setTitle("Map Vote Results")
-            .addFields(
-                {name: 'Map:', value: map},
-            )
             .setColor('PURPLE')
             .setTimestamp();
 
