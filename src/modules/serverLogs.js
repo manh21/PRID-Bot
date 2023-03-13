@@ -228,6 +228,29 @@ const ServerLogs = async (message, client) => {
         }
     }
 
+    if(msg.includes('Running next map.')) {
+        try {
+            // Running next map. - PRID Lieutenant_Mason
+            const name = 'Running next map.'
+            const performed = msg[0].match(/(?<= - )(.*)/gm).trim();
+
+            const embed = new Discord.MessageEmbed()
+                .setTitle("Kicked")
+                .addFields(
+                    {name: 'Name:', value: ` ${name} `},
+                    {name: 'Performed By:', value: ` ${performed} `},
+                )
+                .setDescription("You can rejoin after getting kicked.")
+                .setColor('YELLOW')
+                .setTimestamp();
+
+            sendMsg(serverLogCh, embed);
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+
     if(msg.includes('No parser found')) return;
 
     sendMsg(logCh, embedLog(msg));
